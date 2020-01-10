@@ -7,7 +7,9 @@
 from hyperopt import fmin, tpe, space_eval, Trials, hp
 import math
 
+import torch
 import torch.nn as nn
+import torch.backends.cudnn as cudnn
 
 import balldetect.ball_detector as ball_detector
 
@@ -17,6 +19,10 @@ EPOCHS = 70
 EARLY_STOPPING = 12
 HP_SEARCH_EVALS = 200
 HP_SEARCH_ALGO = tpe.suggest
+
+# Torch CuDNN configuration
+cudnn.benchmark = torch.cuda.is_available()  # Enable builtin CuDNN auto-tuner
+cudnn.fastest = torch.cuda.is_available()  # Disable this if memory issues
 
 
 def objective(params: dict) -> float:

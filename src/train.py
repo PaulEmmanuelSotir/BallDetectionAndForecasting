@@ -18,8 +18,8 @@ import balldetect.seq_prediction as seq_prediction
 
 __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
-# Torch configuration
-cudnn.benchmark = torch.cuda.is_available()  # Enable inbuilt CuDNN auto-tuner TODO: measure performances without this flag
+# Torch CuDNN configuration
+cudnn.benchmark = torch.cuda.is_available()  # Enable builtin CuDNN auto-tuner
 cudnn.fastest = torch.cuda.is_available()  # Disable this if memory issues
 
 # Define hyperparameters
