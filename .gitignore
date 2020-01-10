@@ -4,6 +4,7 @@
 pyrightconfig.json
 datasets/
 models/
+snapshots/
 
 ######## Python ignores ########
 
