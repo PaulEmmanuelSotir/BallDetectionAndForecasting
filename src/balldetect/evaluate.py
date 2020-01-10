@@ -20,6 +20,7 @@ except ImportError:
     import pickle
 
 __all__ = ['evaluate']
+__author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
 
 def evaluate(model, dataset):

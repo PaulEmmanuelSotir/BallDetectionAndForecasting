@@ -4,8 +4,6 @@
 .. moduleauthor:: Fabien Baradel, Paul-Emmanuel Sotir, Christian Wolf  
 .. See https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html and https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting  
 """
-import ipdb
-from tqdm import tqdm
 import os
 import numpy as np
 import argparse
@@ -17,6 +15,7 @@ from PIL import Image, ImageDraw
 from balldetect.datasets import BallsCFDetection, COLORS
 
 __all__ = ['show_img', 'show_bboxes']
+__author__ = 'Fabien Baradel, Paul-Emmanuel Sotir, Christian Wolf'
 
 
 def show_img(np_array_uint8, out_fn):
