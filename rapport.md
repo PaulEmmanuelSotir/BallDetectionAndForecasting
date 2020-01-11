@@ -1,5 +1,5 @@
 # 🦏🎓 RAPPORT TP DEEP LEARNING - INSA Lyon 5IF 🎓🦏
-_Paul-Emmanuel SOTIR <paul-emmanuel.sotir@insa-lyon.fr> <paul-emmanuel@outlook.com>_
+###### _Paul-Emmanuel SOTIR \<paul-emmanuel.sotir@insa-lyon.fr\> ; \<paul-emmanuel@outlook.com\>_
 - Course link https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html
 - Github repository: https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting
   
@@ -17,7 +17,9 @@ _Paul-Emmanuel SOTIR <paul-emmanuel.sotir@insa-lyon.fr> <paul-emmanuel@outlook.c
 
 ### Run instructions
 
-Les dépendences du projets sont gèrées avec un environement conda; Il suffit donc d'une distribution conda (e.g. Anconda ou Miniconda) et de créer l'environement conda pour pouvoir executer le code :  
+Les dépendences du projets sont gèrées avec un environement conda; Il suffit donc d'une distribution conda (e.g. Anconda ou Miniconda) et de créer l'environement conda pour pouvoir executer le code. Les fichiers python **```./src/train.py```** (entrainement d'un model avec les meilleurs hyperparamètres trouvés) et **```./src/hp.py```** (recherche d'hyperparametres executant de nombreux entrainement sur moins d'epochs) sont les deux points d'entrée principals. Ces deux programmes doivent avoir pour argument **```--model detect```** (tâche 1: detection de balles) ou **```--model forecast```** (tâche 2: prédiction de position de balle future).  
+
+Ci dessous les instructions d'installation et des exemples d'execution d'entrainements et de recherches d'hyperparametres sur les tâches 1 et 2 :
 
 ``` shell
 ############## Installation ##############
@@ -31,13 +33,13 @@ bash ./download_dataset.sh
 ############## Exemples d'utilisation ##############
 
 # Entraine le modèle de détection de balles (tache 1) avec les meilleurs hyperparamètres trouvés
-python ./src/train.py --detect
+python -O ./src/train.py --model detect
 # Execute une recherche d'hyperparamètres pour la detection de balles (hyperopt)
-python ./src/train.py --detect
+python -O ./src/hp.py --model detect
 # Entraine le modèle de prédiction de position de balles (tache 2) avec les meilleurs hyperparamètres trouvés
-python ./src/train.py --pred_seq
+python -O ./src/train.py --model forecast
 # Execute une recherche d'hyperparamètres pour la prédiction de position de la balles (hyperopt)
-python ./src/train.py --pred_seq
+python -O ./src/hp.py --model forecast
 ```
 
 ### Developement et docuementation
@@ -90,12 +92,14 @@ DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 _DEFAULT_WORKERS = 0 if __debug__ else min(os.cpu_count() - 1, max(1, os.cpu_count() // 4) * max(1, torch.cuda.device_count()))
 ```
 
-- Pour une meilleur optimization des opérations de Pytorch sur GPU, on peut activer l'auto-tuning (basé sur un benchmark) de la librairie CuDNN s'ajoutant à CUDA. CuDNN est une librairie de NVidia (un fichier cpp et une header C++ ajouté au toolkit CUDA) qui offre des optimisations spécifiques aux réseaux de neurones (Convolutions, produits de matrices, calcul du gradient, ...). CuDNN est intégré à Pytorch comme pour CUDA qui est simplement une dépendance installée dans l'environement Conda. Pytorch permet d'améliorer les performances de CuDNN d'avantage avec les paramètres __```cudnn.benchmark```__ et __```cudnn.fastest```__.
+- Pour une meilleur optimization des opérations de Pytorch sur GPU, on peut activer l'auto-tuning (basé sur un benchmark) de la librairie CuDNN s'ajoutant à CUDA. CuDNN est une librairie de NVidia (un fichier cpp et une header C++ ajouté au toolkit CUDA) qui offre des optimisations spécifiques aux réseaux de neurones (Convolutions, produits de matrices, calcul du gradient, ...). CuDNN est intégré à Pytorch comme pour CUDA qui est simplement une dépendance installée dans l'environement Conda. 
+Pytorch permet d'améliorer les performances de CuDNN d'avantage avec les paramètres __```cudnn.benchmark```__ et __```cudnn.fastest```__. Cependant, activer le benchmarking de CuDNN dans Pytorch peut impacter la reproducibilité des résultats étant donné que ce n'est pas un processus déterministe (même avec **```torch.backends.cudnn.deterministic = True```**).  
 On observe une amélioration de la vitesse d'entrainement entre 30% et 40% pour les modèles Pytorch de detection et de prédiction de position de balles:
 
 ``` python
 # Torch CuDNN configuration
-cudnn.benchmark = torch.cuda.is_available()  # Enable builtin CuDNN auto-tuner
+torch.backends.cudnn.deterministic = True
+cudnn.benchmark = torch.cuda.is_available()  # Enable builtin CuDNN auto-tuner, TODO: benchmarking isn't deterministic, disable this if this is an issue
 cudnn.fastest = torch.cuda.is_available()  # Disable this if memory issues
 ```
 
@@ -103,7 +107,7 @@ cudnn.fastest = torch.cuda.is_available()  # Disable this if memory issues
 
 - Les entrainements des modèles sont également accélérés en parallelisant les 'training steps' sur plusieurs GPUs automatiquement avec __``` model = nn.DataParallel(model) ```__ (voir la fonction __``` paralellize(model: nn.Module) -> nn.Module ```__ dans __```./src/balldetect/torch_utils.py```__). Les modèles ont été entrainé sur une machine personnelle dotée de deux NVidia 1080 ti; La paralèllisation des données avec cette fonction automatique de Pytorch vas donc executer deux entrainements en parallèle et synchroniser les gradients à chaque étapes de manière synchrone en calculant la moyenne des deux 'training steps' avant de passer à l'entrainement sur les prochains batchs.  
 De par le besoin de synchronisation des gradients, le modèle et/ou les données/batch_size doivent être assez volumineux pour que cette parallèlisation offre une accélération de l'entrainement par rapport à l'utilisation d'un seul GPU.  
-Par exemple, on observe pour le modèle de detection de balles qu'il faut une ```batch_size``` supérieure à 64 pour que les deux 1080 ti soit utilisées au delà de 50% (nvidia-smi). Cependant, trop augmenter la batch_size peut poser des problèmes, notamment à cause de la taille limitée du dataset et, pour des modèles plus importants, pourrais demander une quantitée de mémoire vidéo trop grande.  
+Par exemple, on observe pour le modèle de detection de balles qu'il faut une **```batch_size```** supérieure à 64 pour que les deux 1080 ti soit utilisées au delà de 50% (nvidia-smi). Cependant, trop augmenter la batch_size peut poser des problèmes, notamment à cause de la taille limitée du dataset et, pour des modèles plus importants, pourrais demander une quantitée de mémoire vidéo trop grande.  
 
 ##### Tests préliminaires avec fastai (voir notebooks 'brouillons' ```test_fastai.ipynb``` ```test_fastai-bbox.ipynb```)
 
@@ -115,21 +119,22 @@ Cette approche préliminaire a permit de mieux connaitre les avantages et inconv
 
 Le modèle que nous avons construit pour la detection de balles devait dans un premier temps ne détecter que les couleurs de balles et non leur positions.
 
-La loss utilisée pour entrainer le modèle ... TODO: ...
+La loss utilisée pour entrainer le modèle **... TODO: ...**
 
 La recherche d'hyperparamètre à permit de trouver de bien meilleurs paramètres d'entrainement et choisir la bonne variante d'architecture parmit celles définies dans l'espace d'hyperparamètres.  
-Est donné ci-dessous l'espace de recherche des hyperparamètres donné à hyperopt (algorithme ```tpe.suggest``` avec 200 entrainements de 70 epochs et un early_stopping de 12 epochs):
+Est donné ci-dessous l'espace de recherche des hyperparamètres donné à hyperopt (algorithme ```tpe.suggest``` avec 87 entrainements de 70 epochs et un early_stopping de 12 epochs):
 
 ``` python
 # Define hyperparameter search space
 hp_space = {
     'optimizer_params': {'lr': hp.uniform('lr', 5e-6, 1e-4), 'betas': (0.9, 0.999), 'eps': 1e-8,
                             'weight_decay': hp.loguniform('weight_decay', math.log(1e-7), math.log(1e-3)), 'amsgrad': False},
+    'scheduler_params': {'step_size': 40, 'gamma': 0.2},
     # 'scheduler_params': {'max_lr': 1e-2, 'pct_start': 0.3, 'anneal_strategy': 'cos'},
     'batch_size': hp.choice('batch_size', [32, 64, 128]),
     'architecture': {
         'act_fn': nn.LeakyReLU,
-        # TODO: Avoid enabling both dropout and batch normalization at the same time: 1ee ...
+        # TODO: Avoid enabling both dropout and batch normalization at the same time: see ...
         'dropout_prob': hp.choice('dropout_prob', [1., hp.uniform('nonzero_dropout_prob', 0.45, 0.8)]),
         # 'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
         # Convolutional backbone block hyperparameters
@@ -170,18 +175,21 @@ hp_space = {
 La recherche d'hyperparamètres à données les paramètres "optimaux" suivants (best_valid_loss=0.12278, best_train_loss=0.09192 après 67 epcohs):
 
 ``` python
-{'architecture': {
-	'act_fn': nn.LeakyReLU,
-	'conv2d_params': ({'kernel_size': (3, 3), 'out_channels': 4, 'padding': 1},
-			  {'kernel_size': (3, 3), 'out_channels': 4, 'padding': 1},
-			  {'kernel_size': (3, 3), 'out_channels': 8, 'padding': 1},
-			  {'kernel_size': (3, 3), 'out_channels': 8, 'padding': 1, 'stride': 2},
-			  {'kernel_size': (5, 5), 'out_channels': 16, 'padding': 2}),
-	'dropout_prob': 0.7187055796612525,
-	'fc_params': ()},
-	'batch_size': 32,
-	'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 9.961462262405672e-05, 'weight_decay': 0.0002119238018958741}}
+{
+  'architecture': {
+      'act_fn': nn.LeakyReLU,
+      'conv2d_params': ({'kernel_size': (3, 3), 'out_channels': 4, 'padding': 1},
+                        {'kernel_size': (3, 3), 'out_channels': 4, 'padding': 1},
+                        {'kernel_size': (3, 3), 'out_channels': 8, 'padding': 1},
+                        {'kernel_size': (3, 3), 'out_channels': 8, 'padding': 1, 'stride': 2},
+                        {'kernel_size': (5, 5), 'out_channels': 16, 'padding': 2}),
+      'dropout_prob': 0.7187055,
+      'fc_params': []},
+  'batch_size': 32,
+  'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 9.961462262405672e-05, 'weight_decay': 0.0002119238018958741}}
 ```
+
+Nous avons ensuite entrainé le modèle obtenu plus longement et changé le scheduling du learning rate pour permettre une meilleure convergance sur un plus grand nombre d'épochs en évitant l'overfitting: avec ces hyperpramètres un learning rate multiplié par ```gamma=0.2``` toutes les 40 epochs d'entrainement, on obtient: ```best_train_loss=TODO``` et ```best_valid_loss=TODO```
 
 (voir la section __"Résultats/Resultats tache 1"__ ci-dessous pour plus de détails sur les detection faites par ce modèle)
 
@@ -189,7 +197,32 @@ La recherche d'hyperparamètres à données les paramètres "optimaux" suivants 
 
 Le modèle de prédiction de position de balles est un simple réseaux de neurones dense (fully connected layers) puisque qu'il n'y a pas d'images en entrée du modèle.  
 
-La procédure d'entrainement du modèle est relativement similaire à celle du modèle de detection de la tache 1, aux hyperparamètres près. Nous n'avons malheureusement pas eu le temps d'executer une recherche d'hyperparamètres pour ce modèle. De même, par manque de temps, nous n'avons pas pû travailler autant que voulut sur l'amélioration de ce modèle et l'interprètation de la qualité des prédictions faites sur les positions des balles au delà de la métrique utilisée (voir la section __"Résultats/Resultats tache 2"__ ci-dessous)
+La procédure d'entrainement du modèle est relativement similaire à celle du modèle de detection de la tache 1, aux hyperparamètres près. Nous n'avons malheureusement pas eu le temps d'executer une recherche d'hyperparamètres complète pour ce modèle. De même, par manque de temps, nous n'avons pas pû travailler autant que voulut sur l'amélioration de ce modèle et l'interprètation de la qualité des prédictions faites sur les positions des balles au delà de la métrique utilisée (voir la section __"Résultats/Resultats tache 2"__ ci-dessous)
+
+Ci-dessous, l'espace de recherche d'hyperparamètres utilisée pour trouver les paramètres de ce modèle:
+
+``` python
+{
+    'optimizer_params': {'lr': hp.uniform('lr', 5e-6, 1e-4), 'betas': (0.9, 0.999), 'eps': 1e-8, 'weight_decay': hp.loguniform('weight_decay', math.log(1e-7), math.log(1e-2)), 'amsgrad': False},
+    'scheduler_params': {'step_size': EPOCHS, 'gamma': 1.},
+    # 'scheduler_params': {'max_lr': 1e-2, 'pct_start': 0.3, 'anneal_strategy': 'cos'},
+    'batch_size': hp.choice('batch_size', [32, 64, 128]),
+    'architecture': {
+        'act_fn': hp.choice('batch_size', [nn.LeakyReLU, nn.ReLU, nn.Tanh]),
+        # TODO: Avoid enabling both dropout and batch normalization at the same time: see ...
+        'dropout_prob': hp.choice('dropout_prob', [1., hp.uniform('nonzero_dropout_prob', 0.45, 0.8)]),
+        # 'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
+        # Fully connected network hyperparameters (a final FC inference layer with no dropout nor batchnorm will be added when ball position predictor model is instantiated)
+        'fc_params': hp.choice('fc_params', [[{'out_features': 512}, {'out_features': 256}] + [{'out_features': 128}] * 2,
+                                              [{'out_features': 128}] + [{'out_features': 256}] * 2 + [{'out_features': 512}],
+                                              [{'out_features': 128}] + [{'out_features': 256}] * 3,
+                                              [{'out_features': 128}] * 2 + [{'out_features': 256}] * 3,
+                                              [{'out_features': 128}] * 2 + [{'out_features': 256}] * 4,
+                                              [{'out_features': 128}] * 3 + [{'out_features': 256}] * 4])}
+}
+```
+
+La 
 
 ### Résultats
 
@@ -215,11 +248,13 @@ Il est regrettable que la qualité du modèle de la tâche 2 souffre probablemen
 
 + redondance entre couleurs et bounding boxes
 + recherche d'hyperparamètres pour la prédiction de position future des balles
++ utiliser de la cross validation étant donné la petite taille du dataset et créer un petit testset pour évaluer très ponctuellement le modèle autrement que par le validset qui pourrait être compromis par la recherche d'hyperparamètres
 + méthodes de recherche d'hyperparamètres plus efficaces (e.g. la méthode utilisée par fastai dans [callbacks.lr_finder](https://docs.fast.ai/callbacks.lr_finder.html): [post de blog de Sylvain Gugger](https://sgugger.github.io/how-do-you-find-a-good-learning-rate.html)) et utilisation de [microsoft/nni](https://github.com/microsoft/nni) regroupant de nombreuses de méthodes de recherche d'hyperparamètres)
 + utiliser des méthodes de recherche d'architecture automatiques (beaucoup d'engouement/progrès dans la communauté deeplearning autour des méthodes de "neural net architecture search" et "meta-learning")
 + tests plus poussés du scheduling de learning rate (e.g. investiger pourquoi OneCycle learning rate scheduler n'a pas donné de résultats probants sur la détection de balles avec notre modèl)
 + tests plus poussés avec de la batch norm: implémentée mais très peu testée pour réduire l'espace de recherche d'hyperparamètres de par le manque de temps (mais dropout, weight decay, .. utilisé)
 + Utiliser de l'augmentation de données aurait pû être intéressant
+
 
 ![Logo INSA Lyon](https://www.insa-lyon.fr/sites/www.insa-lyon.fr/files/logo-coul.jpg =200x))
 _Copyright (c) 2019 Paul-Emmanuel SOTIR_  

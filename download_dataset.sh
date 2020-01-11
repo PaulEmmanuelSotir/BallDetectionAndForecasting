@@ -4,26 +4,29 @@ DATASETS_DIR='datasets'
 MINIBALLS_DATASET='mini_balls'
 MINIBALLS_SEQ_DATASET='mini_balls_seq'
 
-set -euxo pipefail
+set -euo pipefail
 
 echo "############# DOWNLOADING DATASET(S) #############"
 
-mkdir -p ./$DATASETS_DIR/$MINIBALLS_DATASET
 
 # Download task 1 dataset (miniballs)
+mkdir -p ./$DATASETS_DIR/$MINIBALLS_DATASET
+cd ./$DATASETS_DIR/$MINIBALLS_DATASET
 echo "> #1: Downloading counterfactual ball detection dataset..."
-curl https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/data/train.tgz -o ./$DATASETS_DIR/$MINIBALLS_DATASET/data.tgz
-tar -zxvf ./$DATASETS_DIR/$MINIBALLS_DATASET/data.tgz -C ./$DATASETS_DIR/$MINIBALLS_DATASET/
-rm ./$DATASETS_DIR/$MINIBALLS_DATASET/data.tgz
-mv ./$DATASETS_DIR/$MINIBALLS_DATASET/train/* ./$DATASETS_DIR/$MINIBALLS_DATASET/
-rm -r ./$DATASETS_DIR/$MINIBALLS_DATASET/train/
+curl https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/data/train.tgz --output ./data.tgz
+tar -zxvf ./data.tgz -C ./
+rm ./data.tgz
+mv ./train/* ./
+rm -r ./train/
+cd -
 
 # Download task 2 dataset (miniballs_seq)
 echo "> #2: Downloading counterfactual ball position forecasting dataset..."
-curl https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/data/train_seq.tgz -o ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET/data.tgz
-tar -zxvf ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET/train.tgz -C ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET/
-rm ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET/data.tgz
-mv ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET/train/* ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET/
-rm -r ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET/train/
+mkdir -p ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET
+cd ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET
+curl https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/data/train_seq.tgz --output ./data.tgz
+tar -zxvf ./data.tgz -C ./
+rm ./data.tgz
+cd -
 
 echo "############# DONE #############"
