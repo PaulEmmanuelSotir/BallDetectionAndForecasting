@@ -27,6 +27,8 @@ cd ./$DATASETS_DIR/$MINIBALLS_SEQ_DATASET
 curl https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/data/train_seq.tgz --output ./data.tgz
 tar -zxvf ./data.tgz -C ./
 rm ./data.tgz
+mv ./mini_balls_seq/* ./
+rm -r ./mini_balls_seq/
 cd -
 
 echo "############# DONE #############"
