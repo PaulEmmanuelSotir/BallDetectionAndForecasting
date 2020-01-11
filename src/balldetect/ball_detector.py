@@ -12,11 +12,6 @@ from collections import OrderedDict
 import json
 import numpy as np
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -27,6 +22,7 @@ from torch.optim.lr_scheduler import _LRScheduler
 
 import balldetect.datasets as datasets
 import balldetect.torch_utils as tu
+pickle = tu.import_pickle()
 
 __all__ = ['BallDetector', 'init_training', 'train']
 __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
@@ -79,7 +75,8 @@ class BallDetector(nn.Module):
 
 
 # TODO: add path parameter for dataset dir
-def init_training(batch_size: int, architecture: dict, optimizer_params: dict) -> Tuple[DataLoader, DataLoader, nn.Module, Optimizer, _LRScheduler]:
+def init_training(batch_size: int, architecture: dict, optimizer_params: dict, scheduler_params: dict) -> Tuple[DataLoader, DataLoader, nn.Module, Optimizer, _LRScheduler]:
+    """ Initializes dataset, dataloaders, model, optimizer and lr_scheduler for future training """
     # Create balls dataset
     dataset = datasets.BallsCFDetection(Path("../datasets/mini_balls"), img_transform=F.normalize)
 
@@ -87,16 +84,18 @@ def init_training(batch_size: int, architecture: dict, optimizer_params: dict) -
     trainset, validset = datasets.create_dataloaders(dataset, batch_size, INFERENCE_BATCH_SIZE)
     dummy_img, p, bb = dataset[0]  # Nescessary to retreive input image resolution (assumes all dataset images are of the same size)
     model = BallDetector(dummy_img.shape, (np.prod(p.shape), np.prod(bb.shape)), **architecture)
-    model = tu.parrallelize(model)
+    if batch_size > 64:
+        model = tu.parrallelize(model)
 
     # Define optimizer and LR scheduler
     optimizer = torch.optim.Adam(model.parameters(), **optimizer_params)
-    #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, steps_per_epoch=len(trainset), epochs=hp['epochs'], **hp['scheduler_params'])
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, len(trainset), gamma=1.)
+    #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, steps_per_epoch=len(trainset), epochs=hp['epochs'], **scheduler_params)
+    scheduler_params['step_size'] *= len(trainset)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, **scheduler_params)
     return trainset, validset, model, optimizer, scheduler
 
 
-def train(epochs: int, trainset: DataLoader, validset: DataLoader, model: nn.Module, optimizer: optim.Optimizer, scheduler: optim.lr_scheduler._LRScheduler, early_stopping: Optional[int] = None, pbar: bool = True) -> Tuple[float, float, int]:
+def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimizer: optim.Optimizer, scheduler: optim.lr_scheduler._LRScheduler, epochs: int, early_stopping: Optional[int] = None, pbar: bool = True) -> Tuple[float, float, int]:
     """ Trains model on given dataset """
     model.train(True).to(DEVICE)
     bb_metric, pos_metric = torch.nn.MSELoss(), torch.nn.BCEWithLogitsLoss()
@@ -112,14 +111,13 @@ def train(epochs: int, trainset: DataLoader, validset: DataLoader, model: nn.Mod
     epochs_since_best_loss = 0
 
     # Main training loop
-    for epoch in range(epochs):
-        print("\nEpoch %03d/%03d\n" % (epoch + 1, epochs) + '-' * 15)
+    for epoch in range(1, epochs + 1):
+        print("\nEpoch %03d/%03d\n" % (epoch, epochs) + '-' * 15)
         train_loss = 0
 
         trange, update_bar = tu.progess_bar(trainset, '> Training on trainset', trainset.batch_size, custom_vars=True, disable=not pbar)
         for (batch_x, ps, bbs) in trange:
-            batch_x, ps, bbs = batch_x.to(DEVICE).requires_grad_(True), ps.to(DEVICE), bbs.to(DEVICE)
-            ps, bbs = tu.flatten(ps), tu.flatten(bbs)
+            batch_x, ps, bbs = batch_x.to(DEVICE).requires_grad_(True), tu.flatten(ps.to(DEVICE)), tu.flatten(bbs.to(DEVICE))
 
             def closure():
                 optimizer.zero_grad()
@@ -131,8 +129,8 @@ def train(epochs: int, trainset: DataLoader, validset: DataLoader, model: nn.Mod
             scheduler.step()
             train_loss += loss / len(trainset)
             update_bar(trainLoss=f'{len(trainset) * train_loss / trange.n:.7f}', lr=f'{scheduler.get_lr()[0]:.3E}')
-        print(f'>\tDone: TRAIN_LOSS = {train_loss:.7f}')
 
+        print(f'>\tDone: TRAIN_LOSS = {train_loss:.7f}')
         valid_loss = evaluate(model, validset, pbar=pbar)
         print(f'>\tDone: VALID_LOSS = {valid_loss:.7f}')
 
@@ -147,7 +145,7 @@ def train(epochs: int, trainset: DataLoader, validset: DataLoader, model: nn.Mod
                 print(f'>\tModel not improving: Ran {epochs_since_best_loss} training epochs without improvement. Early stopping training loop...')
                 break
 
-    print(f'>\tBest training results obtained at {best_run_epoch}nth epoch (best_valid_loss={best_valid_loss}, best_train_loss={best_train_loss}).')
+    print(f'>\tBest training results obtained at {best_run_epoch}nth epoch (best_valid_loss={best_valid_loss:.7f}, best_train_loss={best_train_loss:.7f}).')
     return best_train_loss, best_valid_loss, best_run_epoch
 
 
@@ -158,8 +156,7 @@ def evaluate(model: nn.Module, validset: DataLoader, pbar: bool = True) -> float
         valid_loss = 0.
 
         for (batch_x, ps, bbs) in tu.progess_bar(validset, '> Evaluation on validset', validset.batch_size, disable=not pbar):
-            batch_x, ps, bbs = batch_x.to(DEVICE), ps.to(DEVICE).requires_grad_(True), bbs.to(DEVICE).requires_grad_(True)
-            bbs, ps = tu.flatten(bbs), tu.flatten(ps)
+            batch_x, ps, bbs = batch_x.to(DEVICE), tu.flatten(ps.to(DEVICE)), tu.flatten(bbs.to(DEVICE))
             output_ps, output_bbs = model(batch_x)
             valid_loss += (pos_metric(output_ps, ps) + bb_metric(output_bbs, bbs)) / len(validset)
     return float(valid_loss)
@@ -197,7 +194,7 @@ def evaluate(model: nn.Module, validset: DataLoader, pbar: bool = True) -> float
 
 
 # def _log_eval_results(results, type, JSON_log, JSON_log_template='./eval_log_template.json'):
-#     print("Storing evaluation results to " + JSON_log)
+#     print("> Storing evaluation results to " + JSON_log)
 
 #     if not os.path.isfile(JSON_log):
 #         # Copy empty JSON evaluation log template

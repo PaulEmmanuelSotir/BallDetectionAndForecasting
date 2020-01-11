@@ -4,14 +4,18 @@
 .. moduleauthor:: Paul-Emmanuel Sotir
 .. See https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html and https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting
 """
+import types
+import random
+import importlib
 from typing import Tuple, Optional
 
+import numpy as np
 from tqdm import tqdm
 
 import torch
 import torch.nn as nn
 
-__all__ = ['layer', 'conv_layer', 'fc_layer', 'flatten', 'parralelize', 'progess_bar']
+__all__ = ['layer', 'conv_layer', 'fc_layer', 'flatten', 'parralelize', 'set_seeds', 'progess_bar', 'import_pickle']
 __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
 
@@ -36,11 +40,28 @@ def flatten(tensor):
 
 
 def parrallelize(model: nn.Module) -> nn.Module:
-    # Make use of all available GPU using nn.DataParallel
+    """ Make use of all available GPU using nn.DataParallel
+    NOTE: ensure to be using different random seeds for each process if you use techniques like data-augmentation or any other techniques which needs random numbers different for each steps. TODO: make sure this isn't already done by Pytorch?
+    """
     if torch.cuda.device_count() > 1:
-        print("Let's use", torch.cuda.device_count(), "GPUs!")
+        print(f'> Using "nn.DataParallel(model)" on {torch.cuda.device_count()} GPUs.')
         model = nn.DataParallel(model)
     return model
+
+
+def set_seeds(all_seeds: int = 3453493):
+    set_seeds(torch_seed=all_seeds, cuda_seed=all_seeds, np_seed=all_seeds, python_seed=all_seeds)
+
+
+def set_seeds(torch_seed: Optional[int] = None, cuda_seed: Optional[int] = None, np_seed: Optional[int] = None, python_seed: Optional[int] = None):
+    if torch_seed is not None:
+        torch.manual_seed(torch_seed)
+    if cuda_seed is not None and torch.cuda.is_available():
+        torch.cuda.manual_seed_all(cuda_seed)
+    if np_seed is not None:
+        np.random.seed(np_seed)
+    if python_seed is not None:
+        random.seed(python_seed)
 
 
 def progess_bar(iterable, desc, batch_size, custom_vars: bool = False, disable: bool = False):
@@ -53,3 +74,12 @@ def progess_bar(iterable, desc, batch_size, custom_vars: bool = False, disable: 
             t.set_postfix(**kwargs)
         return t, callback
     return t
+
+
+def import_pickle() -> types.ModuleType:
+    """ Returns cPickle module if available, returns imported pickle module otherwise """
+    try:
+        pickle = importlib.import_module('cPickle')
+    except ImportError:
+        pickle = importlib.import_module('pickle')
+    return pickle

@@ -19,7 +19,7 @@ __author__ = 'Fabien Baradel, Paul-Emmanuel Sotir, Christian Wolf'
 
 COLORS = ['red', 'green', 'blue', 'yellow', 'lime', 'purple', 'orange', 'cyan', 'magenta']
 BBOX_SCALE = [[[89., 88., 99., 99.]]]
-VALID_SET_SIZE = 0.015  # ~0.015% of dataset size
+VALID_SET_SIZE = 0.015  # ~0.015% of dataset size, TODO: do cross_validation (dataset too small) and create a small testset in addition to validset and trainset
 _DEFAULT_WORKERS = 0 if __debug__ else min(os.cpu_count() - 1, max(1, os.cpu_count() // 4) * max(1, torch.cuda.device_count()))
 
 
@@ -30,7 +30,7 @@ def create_dataloaders(dataset: Dataset, train_batch_size: int, valid_batch_size
     train_ds, valid_ds = torch.utils.data.Subset(dataset, indices[:-test_size]), torch.utils.data.Subset(dataset, indices[-test_size:])
 
     # Create validset and trainset dataloaders
-    print(f'DEBUG = {__debug__} - Using {num_workers} workers in each DataLoader...')
+    print(f'> __debug__ == {__debug__} - Using {num_workers} workers in each DataLoader...')
     trainset = DataLoader(train_ds, batch_size=train_batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
     validset = DataLoader(valid_ds, batch_size=valid_batch_size, num_workers=num_workers, pin_memory=True)
 
