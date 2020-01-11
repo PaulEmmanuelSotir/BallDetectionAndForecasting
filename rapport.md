@@ -5,15 +5,27 @@
   
 ### Introduction
 
-...
+L'objectif de ce projet est d'acquerir des connaissances autour de l'aspect empirique du deep learning. Ce projet est l'occasion de mieux maitriser le framework pytorch dans un cas d'utilisation simple mais relativement complet.  
+Ce TP se divise en deux taches: implémenter un modèle à base de réseaux neuronaux pour la detection de balles colorées dans des images et un modèle de prédiction de la position future de balles.
+
+Le dataset utilisé dans ce projet est un sous-ensemble du dataset synthétique crée pour les experimentations décrites dans le papier suivant : [_Fabien Baradel, Natalia Neverova, Julien Mille, Greg Mori, Christian Wolf. COPHY: Counterfactual Learning of Physical Dynamics. pre-print arXiv:1909.12000, 2019._](https://arxiv.org/abs/1909.12000).  
+Une des particularités de ce dataset que l'on a observés lors de l'exploration des données est que toutes les images (100x100) ne comprenent que trois balles et chaques balles d'une même image ont une couleur différente parmis les 9 couleurs possibles. On a également pû observer une certaine redondance d'information de par la représentation des données utilisée: les bounding boxes des balles indiquent la couleur, de par leur position dans le tenseur, alors que les informations de couleurs sont déjà présentes dans le vecteur de couleurs. Un des points important de ce TP est que le dataset est pensé pour éviter certaines difficultées communes à la detection d'objet: avec un nombre constant de balles à detecter, les modèles à implémenter sont bien plus simples (pas d'approches récurantes (RCNN) ou similaires aux modèles de detection tels que SSD ou Yolo)  
+
+Pour une meilleure reproductibilité des résultats, nous avons fixé les seeds aléatoires de ```numpy.random```, ```python.random```, de ```torch.manual_seed``` ainsi que ```torch.cuda.manual_seed_all```.
+
+Les données fournies pour ce TP sont divisées en deux sous datasets associés aux deux tâches/parties de ce TP :
 
 ##### Tache 1 : detection de balles
 
-...
+Le but de cette première tâche est dans un premier temps d'implémenter un modèle la couleur des balles d'un image en entrée. Puis dans un second temps, d'ajouter au modèle entrainé, l'inférence des coordonées des bounding boxes donnant la position des balles dans l'image en entrée.
 
 ##### Tache 2 : prédiction de la position future de balles
 
-...
+La seconde partie de ce TP vise à implémenter un modèle pouvant prédire la position future de 3 balles à partir d'une séquence de 19 observations dans le temps de la position des balles dans les images (prédiction de la 20ème observation des balles). Ce modèle ne prend pas nescessairement d'image en entrée, seulement la séquence passée de positions de balles et le vecteur de couleurs d'images suffisent (on suppose que l'image ne contient pas d'informations supplémentaires sur le mouvement des balles).  
+
+Entrainer un modèle sur cette seconde tâche amène le modèle à infèrer partiellement et implicitement les propritétés physiques de la balles. En effet le dataset synthétique a été généré en simulant le mouvement de balles avec des propriété physiques variables (masses, frottements, ect...) et ces paramètres ne sont nullement disponnibles au delà de l'observation du comportement de la balle.  
+
+On peut aussi se poser la question concerant le vecteur de couleurs des balles de si les propriétés physiques des balles sont elles partielement correllées avec leur couleurs respective. Si on prend pour à-priori qu'il n'y a pas de causalité  alors on peut ignorer totalement les couleurs pour cette partie du TP. Nous faisons le choix de prendre le vecteur des couleurs en entrée de notre modèle. A suposer qu'il n'y a pas d'information pertinantes sur les mouvements de balles dans leur couleurs, il faut espèrer que le dataset ne présente pas de correlations sans causalité (nous n'avons pas exploré cet aspect dans l'EDA) et que la régularisation du modèle suffirat à surmonter les légères corrélation.
 
 ### Run instructions
 
@@ -42,6 +54,50 @@ python -O ./src/train.py --model forecast
 python -O ./src/hp.py --model forecast
 ```
 
+Example d'entrainement du model de detection de balles :
+
+``` shell
+(pytorch_5if) pes@pes-desktop:~/BallDetectionAndForecasting/$ python -O ./src/train.py --model detect
+
+> Initializing and training ball detection model (mini_balls dataset)...
+> __debug__ == False - Using 16 workers in each DataLoader...
+
+Epoch 001/250
+---------------
+> Training on trainset 100%|███████████████████████████████████████████████████████| 647/647 [Elapsed=00:07, Remaining=00:00, Speed=84.75batch/s, lr=9.962E-05, trainLoss=0.7427835]
+>       Done: TRAIN_LOSS = 0.7416355
+> Evaluation on validset 100%|████████████████████████████████████████████████████████████████████████████| 1/1 [Elapsed=00:00, Remaining=00:00, Speed= 1.20batch/s, BatchSize=8192]
+>       Done: VALID_LOSS = 0.7947538
+>       Best valid_loss found so far, saving model...
+
+Epoch 002/250
+---------------
+> Training on trainset 100%|███████████████████████████████████████████████████████| 647/647 [Elapsed=00:06, Remaining=00:00, Speed=97.32batch/s, lr=9.962E-05, trainLoss=0.7420747]
+>       Done: TRAIN_LOSS = 0.7306052
+> Evaluation on validset 100%|████████████████████████████████████████████████████████████████████████████| 1/1 [Elapsed=00:00, Remaining=00:00, Speed= 1.49batch/s, BatchSize=8192]
+>       Done: VALID_LOSS = 0.7261569
+>       Best valid_loss found so far, saving model...
+
+Epoch 003/250
+---------------
+> Training on trainset 100%|███████████████████████████████████████████████████████| 647/647 [Elapsed=00:06, Remaining=00:00, Speed=97.18batch/s, lr=9.962E-05, trainLoss=0.7403864]
+>       Done: TRAIN_LOSS = 0.7289430
+> Evaluation on validset 100%|████████████████████████████████████████████████████████████████████████████| 1/1 [Elapsed=00:00, Remaining=00:00, Speed= 1.43batch/s, BatchSize=8192]
+>       Done: VALID_LOSS = 0.7259117
+>       Best valid_loss found so far, saving model...
+
+Epoch 004/250
+---------------
+> Training on trainset 100%|███████████████████████████████████████████████████████| 647/647 [Elapsed=00:06, Remaining=00:00, Speed=96.20batch/s, lr=9.962E-05, trainLoss=0.7426853]
+>       Done: TRAIN_LOSS = 0.7289106
+> Evaluation on validset 100%|████████████████████████████████████████████████████████████████████████████| 1/1 [Elapsed=00:00, Remaining=00:00, Speed= 1.44batch/s, BatchSize=8192]
+>       Done: VALID_LOSS = 0.7262515
+
+...
+...
+...
+```
+
 ### Developement et docuementation
 
 ##### Architecture du projet
@@ -55,7 +111,7 @@ Organisation du dossier du projet:
     - balldetect/               # Module 'balldetect'
       - __init__.py
       - ball_detector.py        # Modèle de detection de balles (tâche 1)
-      - datasets.py             # Objets datasets (fourni) et création des dataloaders
+      - datasets.py             # Objets datasets (fourni), création des dataloaders et fonction 'retrieve_data'
       - seq_prediction.py       # Modèle de prédiction de position de balles (tâche 2)
       - torch_utils.py          # Fonctions définissant du code commun aux deux modèles: Couches de convolution (ConvLayer); Couches denses (FCLayer); parralelize (nn.DataParallel), flatten et progress_bar (tqdm personnalisé); 
       - vis.py                  # Visualization des images avec boundings boxes (fourni)
@@ -92,7 +148,7 @@ DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 _DEFAULT_WORKERS = 0 if __debug__ else min(os.cpu_count() - 1, max(1, os.cpu_count() // 4) * max(1, torch.cuda.device_count()))
 ```
 
-- Pour une meilleur optimization des opérations de Pytorch sur GPU, on peut activer l'auto-tuning (basé sur un benchmark) de la librairie CuDNN s'ajoutant à CUDA. CuDNN est une librairie de NVidia (un fichier cpp et une header C++ ajouté au toolkit CUDA) qui offre des optimisations spécifiques aux réseaux de neurones (Convolutions, produits de matrices, calcul du gradient, ...). CuDNN est intégré à Pytorch comme pour CUDA qui est simplement une dépendance installée dans l'environement Conda. 
+- Pour une meilleure optimization des opérations de Pytorch sur GPU, on peut activer l'auto-tuning (basé sur un benchmark) de la librairie CuDNN s'ajoutant à CUDA. CuDNN est une librairie de NVidia (un fichier cpp et une header C++ ajouté au toolkit CUDA) qui offre des optimisations spécifiques aux réseaux de neurones (Convolutions, produits de matrices, calcul du gradient, ...). CuDNN est intégré à Pytorch comme pour CUDA qui est simplement une dépendance installée dans l'environement Conda. 
 Pytorch permet d'améliorer les performances de CuDNN d'avantage avec les paramètres __```cudnn.benchmark```__ et __```cudnn.fastest```__. Cependant, activer le benchmarking de CuDNN dans Pytorch peut impacter la reproducibilité des résultats étant donné que ce n'est pas un processus déterministe (même avec **```torch.backends.cudnn.deterministic = True```**).  
 On observe une amélioration de la vitesse d'entrainement entre 30% et 40% pour les modèles Pytorch de detection et de prédiction de position de balles:
 
@@ -118,8 +174,18 @@ Cette approche préliminaire a permit de mieux connaitre les avantages et inconv
 ##### Tache 1: Modèle de detection de balles (voir ```./src/balldetect/ball_detector.py``` et les hyperparamètres associés dans ```./src/train.py```)
 
 Le modèle que nous avons construit pour la detection de balles devait dans un premier temps ne détecter que les couleurs de balles et non leur positions.
+Les données issues du dataset on une redondance au niveau des couleurs de balles (information de coueleur présente à la fois dans l'ordre des bounding boxes et dans le vecteur de couleurs). C'est pourquoi nous avons enlevé les vecteurs nuls des boundings boxes (le vecteur de couleurs définit les bounding boxes gardées dans la fonction __```__getitem__```__ de __```balldetect.datasets.BallsCFDetection```__) : le modèle fait donne donc en sortie une régression de 3 bounding boxes (3x4 coordonnées) et une _multi-label classsification_ pour donner en sortie le vecteur de couleurs (9 valeurs binaires, dont 3 sont à 1 et les autres à 0)
 
-La loss utilisée pour entrainer le modèle **... TODO: ...**
+La loss utilisée pour entrainer le modèle est donc l'addiction de deux termes:  
+Le premier terme de la loss est la métrique BCE () évaluant la qualité de la classification multi-labels sur le vecteur de couleurs.  
+Le second terme est une métrique MSE (Mean Squared Error) minimisant l'erreur au quarré moyenne sur la régression des coordonnées des bounding boxes.
+
+Le modèle est composé d'un '_convolution backbone_' suivit d'une ou plusieurs couches denses (_fully connected layer_).  
+Nous avons implémenté l'architecture de manière relativement générique de manière à pouvoir en définir des variantes dans les hyperparamètres facilement.  
+
+Une couche de convolution ou dense (__```nn.Conv2d```__ ou __```nn.Linear```__) peut-être composée d'une fonction d'activation (hyperparametre __```architecture.act_fn```__), de _dropout_ (si __```architecture.dropout_prob != 1.```__), de _batch normalization_ (si __```architecture.batch_norm```__ définit les paramètres __'eps'__ et __'momentum'__ et si il n'y a pas de dropout). Voir [./src/balldetect/torch_utils.py](./src/balldetect/torch_utils.py) pour plus de détails sur l'implémentation des couches.  
+Pour ce modèle, nous avons principalement exploré les fonctions d'activation __```nn.ReLU```__ et __```nn.LeakyReLU```__.
+Les tailles de filtres de convolutions considèrées sont principalement de __3x3__, __5x5__ et parfois __7x7__ et __1x1__ (avec les padding correspondant).  
 
 La recherche d'hyperparamètre à permit de trouver de bien meilleurs paramètres d'entrainement et choisir la bonne variante d'architecture parmit celles définies dans l'espace d'hyperparamètres.  
 Est donné ci-dessous l'espace de recherche des hyperparamètres donné à hyperopt (algorithme ```tpe.suggest``` avec 87 entrainements de 70 epochs et un early_stopping de 12 epochs):
@@ -189,15 +255,23 @@ La recherche d'hyperparamètres à données les paramètres "optimaux" suivants 
   'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 9.961462262405672e-05, 'weight_decay': 0.0002119238018958741}}
 ```
 
+L'architecture du modèle obtenue avec la recherche d'hyperparamètres est la suivante :
+
+![detector_architecture.svg](./figures/detector_architecture.svg)
+
 Nous avons ensuite entrainé le modèle obtenu plus longement et changé le scheduling du learning rate pour permettre une meilleure convergance sur un plus grand nombre d'épochs en évitant l'overfitting: avec ces hyperpramètres un learning rate multiplié par ```gamma=0.2``` toutes les 40 epochs d'entrainement, on obtient: ```best_train_loss=TODO``` et ```best_valid_loss=TODO```
 
-(voir la section __"Résultats/Resultats tache 1"__ ci-dessous pour plus de détails sur les detection faites par ce modèle)
+... TODO ...
+![task1_results]()
 
 ##### Tache 2: Modèle de prédiction de position de balles (voir ```./src/balldetect/seq_prediction.py``` et les hyperparamètres associés dans ```./src/train.py```)
 
 Le modèle de prédiction de position de balles est un simple réseaux de neurones dense (fully connected layers) puisque qu'il n'y a pas d'images en entrée du modèle.  
 
-La procédure d'entrainement du modèle est relativement similaire à celle du modèle de detection de la tache 1, aux hyperparamètres près. Nous n'avons malheureusement pas eu le temps d'executer une recherche d'hyperparamètres complète pour ce modèle. De même, par manque de temps, nous n'avons pas pû travailler autant que voulut sur l'amélioration de ce modèle et l'interprètation de la qualité des prédictions faites sur les positions des balles au delà de la métrique utilisée (voir la section __"Résultats/Resultats tache 2"__ ci-dessous)
+Pour simplifier l'entrainement du modèle, nous avons transformé les données pour enlever la redondance d'information sur la couleur des balles. En effet, puisque la couleur des balles ne changent pas dans la séquence, nous entrainons le modèle pour ne prédire que trois bounding boxes (la position des trois balles données en entrée).  
+Nous enlevons donc les vecteurs nuls des boundings boxes en entrée (19 x 3 x 4 coordonnées) et des bounding box cibles (3 x 4 coordonnées). Nous donnons également le vecteur de couleurs (de taille 9) au cas où la couleur des balles donerais de l'information sur les propriétés physiques des balles. Cette simplification des données permet une convergence bien plus rappide et meilleure.
+
+La procédure d'entrainement du modèle est relativement similaire à celle du modèle de detection de la tache 1, aux hyperparamètres près. Nous n'avons malheureusement pas pû travailler autant que voulut sur l'interprètation de la qualité des prédictions faites sur les positions des balles au delà de la métrique utilisée, la MSE calculée sur les trois bounding boxes de sortie normalisées par le vecteur ```balldetect.datasets.BBOX_SCALE```.
 
 Ci-dessous, l'espace de recherche d'hyperparamètres utilisée pour trouver les paramètres de ce modèle:
 
@@ -222,40 +296,38 @@ Ci-dessous, l'espace de recherche d'hyperparamètres utilisée pour trouver les 
 }
 ```
 
-La 
-
-### Résultats
-
-##### Resultats tache 1 : Detection des balles
-
-Voici un tableau récapitulant les résultats obtenus avec nos modèles: Modèle préliminaire fastai; Modèle inférant seulement la présence de couleurs de balles; Modèle final inférant les couleurs et position des balles dans l'image d'entrée.
-
-![task1_results]()
-
-##### Resultats tache 2 : Prédiction de la position de balles
-
-Voici un tableau récapitulant les résultats obtenus avec notre modèle de prédiction de la position future de la balle à partir de sa position précédente :
-
+... TODO ...
 ![task2_results]()
+
+La recherche d'hyperparamètres n'as pas pu être executée totalement avant le rendu de ce projet, mais les performances du modèle définit 'manuellement' semble correctes. Si ces hyperparamètres 'manuels' semblent fonctioner, c'est probablement grâce à l'équilibre entre régularisation et échelle du learning rate issue des paramètres du modèle de détection et également grâce à la simplification des données de bounding boxes réduites à 3 par elément de la séquence (réduction d'un facteur 3 des données à infèrer et dimminution des données en entrée sans pertes d'informations).
 
 ### Conclusion
 
 Pour conclure, développer et tester des modèles Pytorch, certes simples, m'as permit d'approfondir mes connaissances notamment d'un point de vue pratique/technique.  
 
-Il est regrettable que la qualité du modèle de la tâche 2 souffre probablement d'un manque de temps (ou plutôt d'une meilleure mise en prioté des différents aspects du projet), cepandant, nous avons pû développer des modèles Pytorch et des procédures d'entrainement assez complet, générique et réutilisable. En effet, ce projet a également été l'occasion poser une base de code relativement solide pour de futurs projets.
+Il est regrettable que l'investigation et visualisation des résultats souffre probablement d'un manque de temps (ou plutôt la conséquence des priotés données aux différents aspects du projet), cepandant, nous avons pû développer des modèles Pytorch et des procédures d'entrainement assez fonctionels, complets, générique et réutilisables. En effet, ce projet a également été l'occasion poser une base de code relativement solide pour de futurs projets en Pytorch.
 
-##### Autres pistes et améliorations possibles
+##### Autres pistes et améliorations possibles :
 
-+ redondance entre couleurs et bounding boxes
-+ recherche d'hyperparamètres pour la prédiction de position future des balles
-+ utiliser de la cross validation étant donné la petite taille du dataset et créer un petit testset pour évaluer très ponctuellement le modèle autrement que par le validset qui pourrait être compromis par la recherche d'hyperparamètres
-+ méthodes de recherche d'hyperparamètres plus efficaces (e.g. la méthode utilisée par fastai dans [callbacks.lr_finder](https://docs.fast.ai/callbacks.lr_finder.html): [post de blog de Sylvain Gugger](https://sgugger.github.io/how-do-you-find-a-good-learning-rate.html)) et utilisation de [microsoft/nni](https://github.com/microsoft/nni) regroupant de nombreuses de méthodes de recherche d'hyperparamètres)
++ travailler d'avantage sur l'interprètation, la visualisation et l'investigation des métriques et autres résultats obetnus (faite trop tardivement)
++ essayer le *max_polling* en plus ou à la place du stride de 2 dans les convolution
++ exploiter d'avantage d'a prioris sur le vecteur des couleurs lors de la detection de balles de la tâche 1 : sur les 9 valeurs binaires du vecteur de couleurs, 3 sont à 1 et les autres à 0, or, notre modèle est entrainé pour faire une classification multi-classes (vecteur de couleurs en sortie de taille 9 avec une BCE loss) alors qu'il pourait s'agir de classifier 3 valeurs (comprises entre 0 et 8) représantant les index des valeurs à 1 dans le vecteur de couleurs. Cepandant, il n'est pas certains que cette approche améliorerais les performances puisque prédire une 'simili-lookup table' (ou embedding layer) a ses avantages : empiriquement on constate souvent que la qualité des prédictions est meilleures ainsi (probablement car les gradients sont moins 'intriqués' en sortie et chaque possiblitées de classification à une sortie dédiée, donc un parcours dans le réseaux plus indépendant).
++ finir l'implémentation de la sauvegarde de modèles et du logging des métriques pour tensorboard (utilisation de tensorboard avec Pytorch pour mieux diagnostiquer et visualiser l'entrainement et les résultats).
++ voir si enlever la redondance d'information entre couleurs et bounding boxes n'as pas finalement compliqué l'entrainement de par le fait que l'ordre des boundings boxes à inférer en sortie des modèles est plus complexe/intriquée (la loss seras complètement différente si les 3 bounding boxes en sortie sont dans un ordre différent, même si elles restent identiques). Il faudrais investiger ce problème et essayer des workaround (comme par exemple, une loss invariante à l'ordre des bounding boxes inférées).
++ exploiter l'as prioris sur les coordonnées des bounding boxes: non seulement les coordonnées sont dans un certain ordre mais, dans ce dataset, toutes les balles sont environs de la même taille, ont pourrait donc simplement faire une regression sur, par exemple, la moyennes des deux coordonnées d'une bounding box (centre de la balle). De manière moins agressive, on pourrait ajouter un terme dans la loss encouragant un certain ordre entre les valeurs des coordonnées des bounding boxes.
++ utiliser la mean average precision combinée avec une métrique _d'Intersection over Union_ (IoU) pour la regression des bounding boxes, comme utilisée sur le dataset Pascal VOC
++ dans la loss du modèle de detection de balles : ajouter un facteur multipliant la loss BCE sur la classification des couleurs pour équilibrer l'importance de ce terme dans la loss par rapport à la MSE de la régression des bounding boxes.
++ utiliser de la cross validation étant donné la petite taille du dataset
++ créer un petit testset pour évaluer très ponctuellement le modèle autrement que par le validset qui pourrait être compromis par la recherche d'hyperparamètres
++ utiliser des méthodes de recherche d'hyperparamètres plus efficaces (e.g. la méthode utilisée par fastai dans [callbacks.lr_finder](https://docs.fast.ai/callbacks.lr_finder.html): [post de blog de Sylvain Gugger](https://sgugger.github.io/how-do-you-find-a-good-learning-rate.html)) et utilisation de [microsoft/nni](https://github.com/microsoft/nni) regroupant de nombreuses de méthodes de recherche d'hyperparamètres)
 + utiliser des méthodes de recherche d'architecture automatiques (beaucoup d'engouement/progrès dans la communauté deeplearning autour des méthodes de "neural net architecture search" et "meta-learning")
 + tests plus poussés du scheduling de learning rate (e.g. investiger pourquoi OneCycle learning rate scheduler n'a pas donné de résultats probants sur la détection de balles avec notre modèl)
 + tests plus poussés avec de la batch norm: implémentée mais très peu testée pour réduire l'espace de recherche d'hyperparamètres de par le manque de temps (mais dropout, weight decay, .. utilisé)
-+ Utiliser de l'augmentation de données aurait pû être intéressant
++ utiliser de l'augmentation de données aurait pû être intéressant
++ comparer les résultats et approches avec le papier https://arxiv.org/pdf/1909.12000.pdf
 
 
-![Logo INSA Lyon](https://www.insa-lyon.fr/sites/www.insa-lyon.fr/files/logo-coul.jpg =200x))
+<img width=250 src="./figures/logo_insa.jpg"/>
+
 _Copyright (c) 2019 Paul-Emmanuel SOTIR_  
 **_This project and document is under open-source MIT license, browse to: https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting/blob/master/LICENSE for full MIT license text._**

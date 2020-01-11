@@ -64,7 +64,7 @@ class BallDetector(nn.Module):
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         x = self._conv_layers(x)  # Process backbone features
-        x = tu.flatten(x)
+        x = tu.flatten_batch(x)
         x = self._fc_layers(x)  # Apply fully connected head neural net
 
         pos_logits = x[:, :self._p_output_size]  # infered positions: logits from a log_softmax layer
@@ -78,7 +78,8 @@ class BallDetector(nn.Module):
 def init_training(batch_size: int, architecture: dict, optimizer_params: dict, scheduler_params: dict) -> Tuple[DataLoader, DataLoader, nn.Module, Optimizer, _LRScheduler]:
     """ Initializes dataset, dataloaders, model, optimizer and lr_scheduler for future training """
     # Create balls dataset
-    dataset = datasets.BallsCFDetection(Path("../datasets/mini_balls"), img_transform=F.normalize)
+    dir_path = Path(os.path.dirname(os.path.realpath(__file__)))
+    dataset = datasets.BallsCFDetection(dir_path.joinpath("../../datasets/mini_balls"), img_transform=F.normalize)
 
     # Create ball detector model and dataloaders
     trainset, validset = datasets.create_dataloaders(dataset, batch_size, INFERENCE_BATCH_SIZE)
@@ -115,14 +116,15 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
         print("\nEpoch %03d/%03d\n" % (epoch, epochs) + '-' * 15)
         train_loss = 0
 
-        trange, update_bar = tu.progess_bar(trainset, '> Training on trainset', trainset.batch_size, custom_vars=True, disable=not pbar)
-        for (batch_x, ps, bbs) in trange:
-            batch_x, ps, bbs = batch_x.to(DEVICE).requires_grad_(True), tu.flatten(ps.to(DEVICE)), tu.flatten(bbs.to(DEVICE))
+        trange, update_bar = tu.progess_bar(trainset, '> Training on trainset', min(
+            len(trainset.dataset), trainset.batch_size), custom_vars=True, disable=not pbar)
+        for (batch_x, colors, bbs) in trange:
+            batch_x, colors, bbs = batch_x.to(DEVICE).requires_grad_(True), tu.flatten_batch(colors.to(DEVICE)), tu.flatten_batch(bbs.to(DEVICE))
 
             def closure():
                 optimizer.zero_grad()
-                output_ps, output_bbs = model(batch_x)
-                loss = pos_metric(output_ps, ps) + bb_metric(output_bbs, bbs)
+                output_colors, output_bbs = model(batch_x)
+                loss = pos_metric(output_colors, colors) + bb_metric(output_bbs, bbs)
                 loss.backward()
                 return loss
             loss = optimizer.step(closure).detach()
@@ -155,10 +157,10 @@ def evaluate(model: nn.Module, validset: DataLoader, pbar: bool = True) -> float
         bb_metric, pos_metric = torch.nn.MSELoss(), torch.nn.BCEWithLogitsLoss()
         valid_loss = 0.
 
-        for (batch_x, ps, bbs) in tu.progess_bar(validset, '> Evaluation on validset', validset.batch_size, disable=not pbar):
-            batch_x, ps, bbs = batch_x.to(DEVICE), tu.flatten(ps.to(DEVICE)), tu.flatten(bbs.to(DEVICE))
-            output_ps, output_bbs = model(batch_x)
-            valid_loss += (pos_metric(output_ps, ps) + bb_metric(output_bbs, bbs)) / len(validset)
+        for (batch_x, colors, bbs) in tu.progess_bar(validset, '> Evaluation on validset', min(len(validset.dataset), validset.batch_size), disable=not pbar):
+            batch_x, colors, bbs = batch_x.to(DEVICE), tu.flatten_batch(colors.to(DEVICE)), tu.flatten_batch(bbs.to(DEVICE))
+            output_colors, output_bbs = model(batch_x)
+            valid_loss += (pos_metric(output_colors, colors) + bb_metric(output_bbs, bbs)) / len(validset)
     return float(valid_loss)
 
 

@@ -65,9 +65,13 @@ class BallsCFDetection(Dataset):
 
         # Load presence and bounding boxes and split it up
         p_bb = np.load("%s/p_bb_%05d.npy" % (self.path, index)).astype(dtype=np.float32, copy=False)
-        p = torch.tensor(p_bb[:, 0], dtype=torch.float32)
-        bb = torch.tensor(p_bb[:, 1:5] / BBOX_SCALE, dtype=torch.float32)
-        return img, p, bb
+        colors = torch.tensor(p_bb[:, 0], dtype=torch.float32)
+        bbs = torch.tensor(p_bb[:, 1:5] / BBOX_SCALE, dtype=torch.float32)
+
+        # Remove zero vectors (remove information redoundancy) to simplify task to be learned by model (we don't need to infer ball colors twice, 'colors' vector will already be infered)
+        bbs = torch.tensor(bbs[:, colors != 0, :], dtype=torch.float32)
+
+        return img, colors, bbs
 
     # Return the dataset size
     def __len__(self):
@@ -81,17 +85,19 @@ class BallsCFSeq(Dataset):
 
     def __init__(self, path):
         self.path = path
-        self.seq_count = len(fnmatch.filter(os.listdir(path), 'seq_bb_*.npy'))
+        self.seq_count = len(fnmatch.filter(os.listdir(path), 'seq_bb_*'))
 
-    # The access is _NOT_ shuffled. The Dataloader will need
-    # to do this.
+    # The access is _NOT_ shuffled. The Dataloader will need to do this.
     def __getitem__(self, index):
         # Load presence and bounding boxes
-        p = np.load("%s/p_%05d.npy" % (self.path, index))
-        bb = np.load("%s/seq_bb_%05d.npy" % (self.path, index))
+        colors = np.load("%s/p_%05d.npy" % (self.path, index))
+        bbs = np.load("%s/seq_bb_%05d.npy" % (self.path, index)) / BBOX_SCALE
 
-        # split bounding boxes and create tensors from data
-        return torch.tensor([p, bb[:5] / BBOX_SCALE], dtype=torch.float32), torch.tensor(bb[5:], dtype=torch.float32)
+        # Remove zero vectors to simplify task to be learned by model (we don't need to infer ball color: 'p' color won't change during sequence)
+        bbs = torch.tensor(bbs[:, colors != 0, :], dtype=torch.float32)
+
+        # Return input bb sequence, target_bb (last balls positions) and colors vector
+        return bbs[:-1], torch.tensor(colors, dtype=torch.float32), bbs[-1]
 
     # Return the dataset size
     def __len__(self):

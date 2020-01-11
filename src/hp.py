@@ -22,9 +22,9 @@ import balldetect.seq_prediction as seq_prediction
 
 __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
-EPOCHS = 70
+EPOCHS = 90
 EARLY_STOPPING = 12
-HP_SEARCH_EVALS = 200
+HP_SEARCH_EVALS = 100
 HP_SEARCH_ALGO = tpe.suggest
 
 # Torch CuDNN configuration

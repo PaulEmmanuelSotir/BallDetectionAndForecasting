@@ -15,7 +15,7 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 
-__all__ = ['layer', 'conv_layer', 'fc_layer', 'flatten', 'parralelize', 'set_seeds', 'progess_bar', 'import_pickle']
+__all__ = ['layer', 'conv_layer', 'fc_layer', 'flatten_batch', 'parralelize', 'set_seeds', 'progess_bar', 'import_pickle']
 __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
 
@@ -35,7 +35,7 @@ def fc_layer(linear: dict, act_fn: type = nn.Identity, dropout_prob: float = 0.,
     return nn.Sequential(*layer(nn.Linear(**linear), act_fn(), dropout_prob, batch_norm))
 
 
-def flatten(tensor):
+def flatten_batch(tensor):
     return tensor.view(tensor.size(0), -1)  # Flattens target bounding boxes and positions
 
 
@@ -71,7 +71,7 @@ def progess_bar(iterable, desc, batch_size, custom_vars: bool = False, disable: 
              '| {n_fmt}/{total_fmt} [Elapsed={elapsed}, Remaining={remaining}, Speed={rate_fmt}{postfix}]')
     if custom_vars:
         def callback(**kwargs):
-            t.set_postfix(**kwargs)
+            t.set_postfix(batch_size=batch_size, **kwargs)
         return t, callback
     return t
 

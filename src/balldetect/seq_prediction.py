@@ -4,6 +4,7 @@
 .. moduleauthor:: Paul-Emmanuel Sotir
 .. See https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html and https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting
 """
+import os
 from typing import Tuple, Optional
 from pathlib import Path
 from collections import OrderedDict
@@ -59,18 +60,19 @@ def init_training(batch_size: int, architecture: dict, optimizer_params: dict, s
     """ Initializes dataset, dataloaders, model, optimizer and lr_scheduler for future training """
     # TODO: refactor this to avoid some duplicated code with ball_detector.init_training()
     # Create balls dataset
-    dataset = datasets.BallsCFSeq(Path("../datasets/mini_balls_seq"))
+    dir_path = Path(os.path.dirname(os.path.realpath(__file__)))
+    dataset = datasets.BallsCFSeq(dir_path.joinpath("../../datasets/mini_balls_seq"))
 
     # Create ball detector model and dataloaders
     trainset, validset = datasets.create_dataloaders(dataset, batch_size, INFERENCE_BATCH_SIZE)
-    p, bb = dataset[0]  # Nescessary to retreive input image resolution (assumes all dataset images are of the same size)
-    model = SeqPredictor(p.shape, np.prod(bb.shape), **architecture)
+    input_bb_sequence, colors, target_bb = dataset[0]  # Nescessary to retreive input image resolution (assumes all dataset images are of the same size)
+    model = SeqPredictor(np.prod(input_bb_sequence.shape) + np.prod(colors.shape), np.prod(target_bb.shape), **architecture)
     if batch_size > 64:
         model = tu.parrallelize(model)
 
     # Define optimizer and LR scheduler
     optimizer = torch.optim.Adam(model.parameters(), **optimizer_params)
-    #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, steps_per_epoch=len(trainset), epochs=hp['epochs'], **scheduler_params)
+    # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, steps_per_epoch=len(trainset), epochs=hp['epochs'], **scheduler_params)
     scheduler_params['step_size'] *= len(trainset)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, **scheduler_params)
     return trainset, validset, model, optimizer, scheduler
@@ -98,13 +100,14 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
         train_mse = 0
 
         trange, update_bar = tu.progess_bar(trainset, '> Training on trainset', trainset.batch_size, custom_vars=True, disable=not pbar)
-        for (batch_x, batch_y) in trange:
-            batch_x, batch_y = tu.flatten(batch_x.to(DEVICE)), tu.flatten(batch_y.to(DEVICE).requires_grad_(True))
+        for (input_bb_sequence, colors, target_bb) in trange:
+            batch_x = torch.cat((tu.flatten_batch(input_bb_sequence.to(DEVICE)).T, colors.to(DEVICE).T)).T.requires_grad_(True)
+            target_bb = tu.flatten_batch(target_bb.to(DEVICE))
 
             def closure():
                 optimizer.zero_grad()
                 output = model(batch_x)
-                loss = mse(output, batch_y)
+                loss = mse(output, target_bb)
                 loss.backward()
                 return loss
             loss = optimizer.step(closure)
@@ -137,8 +140,9 @@ def evaluate(model, validset, pbar: bool = True) -> float:
         metric = torch.nn.MSELoss()
         valid_mse = 0.
 
-        for (batch_x, _ps, batch_bbs) in tu.progess_bar(validset, '> Evaluation on validset', validset.batch_size, disable=not pbar):
-            batch_x, batch_bbs = batch_x.to(DEVICE), tu.flatten(batch_bbs.to(DEVICE))
+        for (input_bb_sequence, colors, target_bb) in tu.progess_bar(validset, '> Evaluation on validset', validset.batch_size, disable=not pbar):
+            batch_x = torch.cat((tu.flatten_batch(input_bb_sequence.to(DEVICE)).T, colors.to(DEVICE).T)).T.requires_grad_(True)
+            target_bb = tu.flatten_batch(target_bb.to(DEVICE))
             output = model(batch_x)
-            valid_mse += metric(output, batch_bbs) / len(validset)
+            valid_mse += metric(output, target_bb) / len(validset)
     return float(valid_mse)
