@@ -37,19 +37,16 @@ def show_bboxes(rgb_array, np_bbox, list_colors, out_fn='./bboxes_on_rgb.png'):
     list_colors: list of string of length 9
     """
     assert np_bbox.shape[0] == len(list_colors)
-    r = rgb_array.numpy()
-    r = np.uint8(r)
-    r = np.transpose(r, (1, 2, 0))
 
-    img_rgb = Image.fromarray(r, 'RGB')
+    img_rgb = Image.fromarray(rgb_array, 'RGB')
     draw = ImageDraw.Draw(img_rgb)
-    N = np_bbox.shape[0]
-    for i in range(N):
+
+    for i in range(len(list_colors)):
         color = COLORS[i]
         x_1, y_1, x_2, y_2 = np_bbox[i]
         draw.rectangle(((x_1, y_1), (x_2, y_2)), outline=color, fill=None)
 
-    img_rgb.show()
+    # img_rgb.show()
     img_rgb.save(out_fn)
 
 

@@ -5,6 +5,7 @@
 .. See https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html and https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting
 """
 import os
+import shutil
 from typing import Tuple, Optional
 from pathlib import Path
 from collections import OrderedDict
@@ -22,6 +23,7 @@ from torch.optim.lr_scheduler import _LRScheduler
 
 import balldetect.datasets as datasets
 import balldetect.torch_utils as tu
+import balldetect.vis as vis
 pickle = tu.import_pickle()
 
 __all__ = ['BallDetector', 'init_training', 'train']
@@ -29,6 +31,8 @@ __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 INFERENCE_BATCH_SIZE = 8*1024  # Batch size used during inference (including validset evaluation)
+SOURCE_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
+VIS_DIR = SOURCE_DIR / f'../../visualization_imgs/detector'
 
 
 class BallDetector(nn.Module):
@@ -78,8 +82,7 @@ class BallDetector(nn.Module):
 def init_training(batch_size: int, architecture: dict, optimizer_params: dict, scheduler_params: dict) -> Tuple[DataLoader, DataLoader, nn.Module, Optimizer, _LRScheduler]:
     """ Initializes dataset, dataloaders, model, optimizer and lr_scheduler for future training """
     # Create balls dataset
-    dir_path = Path(os.path.dirname(os.path.realpath(__file__)))
-    dataset = datasets.BallsCFDetection(dir_path.joinpath("../../datasets/mini_balls"), img_transform=F.normalize)
+    dataset = datasets.BallsCFDetection(SOURCE_DIR.joinpath("../../datasets/mini_balls"), img_transform=F.normalize)
 
     # Create ball detector model and dataloaders
     trainset, validset = datasets.create_dataloaders(dataset, batch_size, INFERENCE_BATCH_SIZE)
@@ -100,6 +103,8 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
     """ Trains model on given dataset """
     model.train(True).to(DEVICE)
     bb_metric, pos_metric = torch.nn.MSELoss(), torch.nn.BCEWithLogitsLoss()
+    shutil.rmtree(VIS_DIR)
+    VIS_DIR.mkdir(parents=True)
 
     # Weight xavier initialization
     def _initialize_weights(module):
@@ -133,7 +138,7 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
             update_bar(trainLoss=f'{len(trainset) * train_loss / trange.n:.7f}', lr=f'{scheduler.get_lr()[0]:.3E}')
 
         print(f'>\tDone: TRAIN_LOSS = {train_loss:.7f}')
-        valid_loss = evaluate(model, validset, pbar=pbar)
+        valid_loss = evaluate(epoch, model, validset, pbar=pbar)
         print(f'>\tDone: VALID_LOSS = {valid_loss:.7f}')
 
         if best_valid_loss > valid_loss:
@@ -151,19 +156,26 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
     return best_train_loss, best_valid_loss, best_run_epoch
 
 
-def evaluate(model: nn.Module, validset: DataLoader, pbar: bool = True) -> float:
+def evaluate(epoch: int, model: nn.Module, validset: DataLoader, pbar: bool = True) -> float:
     model.eval()
     with torch.no_grad():
         bb_metric, pos_metric = torch.nn.MSELoss(), torch.nn.BCEWithLogitsLoss()
-        valid_loss = 0.
+        valid_loss, first_step = 0., True
 
         for (batch_x, colors, bbs) in tu.progess_bar(validset, '> Evaluation on validset', min(len(validset.dataset), validset.batch_size), disable=not pbar):
             batch_x, colors, bbs = batch_x.to(DEVICE), tu.flatten_batch(colors.to(DEVICE)), tu.flatten_batch(bbs.to(DEVICE))
             output_colors, output_bbs = model(batch_x)
             valid_loss += (pos_metric(output_colors, colors) + bb_metric(output_bbs, bbs)) / len(validset)
+
+            if first_step:
+                first_step = False
+                for idx in [0, 45, 77, 89, 99, 122, 220]:
+                    print(f"> ! Saving visualization image of inference on {idx}th validset value...")
+                    img, bbs, _cols = datasets.retrieve_data(batch_x[idx], output_bbs[idx], output_colors[idx])
+                    vis.show_bboxes(img, bbs, datasets.COLORS, out_fn=VIS_DIR / f'vis_epoch_{epoch}_valid_{idx}.png')
     return float(valid_loss)
 
-
+# TODO: finalize saving implementation
 # def save_experiment(save_dir: Path, model: nn.Module, hyperparameters: Optional[dict] = None, eval_metrics: Optional[dict] = None, train_metrics: Optional[dict] = None):
 #     """ Saves a pytorch model along with experiment information like hyperparameters, test metrics and training metrics """
 #     if not save_dir.is_dir():

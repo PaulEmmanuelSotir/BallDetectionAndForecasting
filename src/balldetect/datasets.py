@@ -9,12 +9,15 @@ import fnmatch
 import numpy as np
 from skimage import io
 from typing import Tuple
+from typing import Optional
 
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 
-__all__ = ['COLORS', 'BBOX_SCALE', 'VALID_SET_SIZE', 'BallsCFDetection', 'BallsCFSeq', 'create_dataloaders']
+from torch import dtype
+
+__all__ = ['COLORS', 'BBOX_SCALE', 'VALID_SET_SIZE', 'BallsCFDetection', 'BallsCFSeq', 'create_dataloaders', 'retrieve_data']
 __author__ = 'Fabien Baradel, Paul-Emmanuel Sotir, Christian Wolf'
 
 COLORS = ['red', 'green', 'blue', 'yellow', 'lime', 'purple', 'orange', 'cyan', 'magenta']
@@ -35,6 +38,32 @@ def create_dataloaders(dataset: Dataset, train_batch_size: int, valid_batch_size
     validset = DataLoader(valid_ds, batch_size=valid_batch_size, num_workers=num_workers, pin_memory=True)
 
     return trainset, validset
+
+
+def retrieve_data(img: Optional[torch.Tensor] = None, bbs: Optional[torch.Tensor] = None, colors: Optional[torch.Tensor] = None):
+    (retrieved_img, retrieved_bbs, retrieved_colors) = None, None, None
+
+    if img is not None:
+        retrieved_img = np.array(img.clone().detach().cpu()).reshape(3, 100, 100)
+        retrieved_img *= (255 / retrieved_img.max(axis=(1, 2)))[:, np.newaxis, np.newaxis]
+        retrieved_img = np.moveaxis(retrieved_img, 0, 2)
+        retrieved_img = np.asarray(np.clip(np.round(retrieved_img), a_min=0, a_max=254), dtype=np.uint8)
+
+    if colors is not None:
+        colors = np.array(colors.clone().detach().cpu())
+        retrieved_colors = np.zeros(colors.shape, dtype=np.bool)
+        retrieved_colors[np.argsort(colors)[-3:]] = True
+
+    if bbs is not None:
+        retrieved_bbs = np.array(bbs.clone().detach().cpu()).reshape(3, 4) * BBOX_SCALE
+        retrieved_bbs = np.clip(np.round(retrieved_bbs), a_min=0, a_max=100)
+        if retrieved_colors is not None:
+            # Use colors to add missing empty/zero bounding boxes to bbs
+            new_bbs = np.zeros((9, 4))
+            new_bbs[retrieved_colors] = retrieved_bbs
+            retrieved_bbs = new_bbs
+
+    return retrieved_img, retrieved_bbs, retrieved_colors
 
 
 class BallsCFDetection(Dataset):

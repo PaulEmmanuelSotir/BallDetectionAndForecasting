@@ -23,6 +23,7 @@ def layer(layer_op: nn.Module, act_fn: nn.Module, dropout_prob: float, batch_nor
     if dropout_prob is not None and dropout_prob != 0.:
         return (nn.Dropout(p=dropout_prob), layer_op, act_fn)
     # elif batch_norm is not None and batch_norm:
+        # Applies Batch_narm after ReLu : see reddit thread about it : https://www.reddit.com/r/MachineLearning/comments/67gonq/d_batch_normalization_before_or_after_relu/
     #    return (layer_op, act_fn, nn.BatchNorm2d(, **batch_norm))  # TODO: fix batch_norm: handle num_features
     return (layer_op, act_fn)
 
