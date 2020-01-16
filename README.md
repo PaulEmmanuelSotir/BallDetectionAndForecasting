@@ -23,7 +23,7 @@ python -O ./src/hp.py --model detect | tee ./hp_search_logs/hp_detect5.log
 # Trains ball position forecasting model
 python -O ./src/train.py --model forecast
 # Performs an hyperparameter search for ball position forecasting model (hyperopt)
-python -O ./src/hp.py --model forecast | tee ./hp_search_logs/hp_forecast4.log
+python -O ./src/hp.py --model forecast | tee ./hp_search_logs/hp_forecast3.log
 ```
 
 Once hyperparameter searchs are done (or still running), you can use __```balldetect.torch_utils.extract_from_hp_search_log()```__ and __```balldetect.torch_utils.summarize_hp_search()```__ function to parse and summarize hyperparameter search results. See ```./notebooks/ball_detection_hp_search_results``` (or ```./docs/rapport.md```) for some hyperparameter search results of our own.
