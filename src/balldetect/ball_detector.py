@@ -30,9 +30,7 @@ __all__ = ['BallDetector', 'init_training', 'train']
 __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-INFERENCE_BATCH_SIZE = 8*1024  # Batch size used during inference (including validset evaluation)
-SOURCE_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
-VIS_DIR = SOURCE_DIR / f'../../visualization_imgs/detector'
+VIS_DIR = tu.source_dir() / f'../../visualization_imgs/detector2'
 
 
 class BallDetector(nn.Module):
@@ -40,77 +38,107 @@ class BallDetector(nn.Module):
     .. class:: BallDetector
     """
 
-    __constants__ = ['_input_shape', '_p_output_size', '_bb_output_size', '_conv_features_shape', '_conv_out_features']
+    __constants__ = ['_input_shape', '_p_output_size', '_bb_output_size', '_xavier_gain', '_conv_features_shapes', '_conv_out_features']
 
-    def __init__(self, input_shape: torch.Size, output_sizes: tuple, conv2d_params: list, fc_params: list, act_fn: type = nn.ReLU, dropout_prob: float = 0., batch_norm: Optional[dict] = None):
+    def __init__(self, input_shape: torch.Size, output_sizes: tuple, layers_param: list, act_fn: type = nn.ReLU, dropout_prob: float = 0., batch_norm: Optional[dict] = None):
         super(BallDetector, self).__init__()
         self._input_shape = input_shape
         self._p_output_size, self._bb_output_size = output_sizes
-        conv2d_params, fc_params = list(conv2d_params), list(fc_params)
+        self._xavier_gain = nn.init.calculate_gain(tu.get_gain_name(act_fn))
+        self._conv_features_shapes, self._conv_out_features = [], None
+        layers_param = list(layers_param)
 
-        # Define neural network architecture (convolution backbone followed by fullyconnected head)
+        # Define neural network architecture
         layers = []
-        for prev_params, (i, params) in zip([None] + conv2d_params[:-1], enumerate(conv2d_params)):
-            params['in_channels'] = prev_params['out_channels'] if prev_params is not None else self._input_shape[-3]
-            layers.append((f'conv_layer_{i}', tu.conv_layer(params, act_fn, dropout_prob, batch_norm)))
-        self._conv_layers = nn.Sequential(OrderedDict(layers))
-        self._conv_features_shape = self._conv_layers(torch.zeros(torch.Size((1, *self._input_shape)))).shape
-        self._conv_out_features = np.prod(self._conv_features_shape[-3:])
+        in_conv_backbone, prev_out = True, self._input_shape[-3]
 
-        layers = []
-        for prev_params, (i, params) in zip([None] + fc_params[:-1], enumerate(fc_params)):
-            params['in_features'] = prev_params['out_features'] if prev_params is not None else self._conv_out_features
-            layers.append((f'fc_layer_{i}', tu.fc_layer(params, act_fn, dropout_prob, batch_norm)))
-        # Append last fully connected inference layer (no dropout nor batch normalization for this layer)
-        layers.append(('fc_layer', tu.fc_layer({'in_features': fc_params[-1]['out_features'] if len(fc_params) > 0 else self._conv_out_features,
-                                                'out_features': self._p_output_size + self._bb_output_size})))
-        self._fc_layers = nn.Sequential(OrderedDict(layers))
+        for name, params in layers_param:
+            if name == 'avg_pooling':
+                layers.append(nn.AvgPool2d(**params) if in_conv_backbone else nn.AvgPool1d(**params))
+
+            elif name == 'conv2d':
+                params['in_channels'] = prev_out
+                layers.append(tu.conv_layer(params, act_fn, dropout_prob, batch_norm))
+                prev_out = params['out_channels']
+                # Get convolution output features shape by performing a dummy forward
+                with torch.no_grad():
+                    net = nn.Sequential(*layers)
+                    dummy_batch_x = torch.zeros(torch.Size((1, *self._input_shape)))
+                    self._conv_features_shapes.append(net(dummy_batch_x).shape)
+
+            elif name == 'fully_connected':
+                # Determine in_features for this fully connected layer
+                if in_conv_backbone:  # First FC layer following convolution backbone
+                    self._conv_out_features = np.prod(self._conv_features_shapes[-1][-3:])
+                    params['in_features'] = self._conv_out_features
+                    in_conv_backbone = False
+                else:
+                    params['in_features'] = prev_out
+                if 'out_features' not in params:
+                    # Handle last fully connected layer (no dropout nor batch normalization for this layer)
+                    params['out_features'] = self._p_output_size + self._bb_output_size
+                    layers.append(tu.fc_layer(params))
+                else:
+                    layers.append(tu.fc_layer(params, act_fn, dropout_prob, batch_norm))
+                prev_out = params['out_features']
+
+            elif name == 'flatten':
+                layers.append(tu.Flatten())
+        self._layers = nn.Sequential(*layers)
+
+    def init_params(self):
+        def _initialize_weights(module: nn.Module):
+            mtype = type(module).__module__
+            if mtype == nn.Conv2d.__module__:
+                nn.init.xavier_normal_(module.weight.data, gain=self._xavier_gain)
+                module.bias.data.fill_(0.)
+            elif issubclass(type(module), nn.Linear):
+                nn.init.xavier_uniform_(module.weight.data, gain=self._xavier_gain)
+                module.bias.data.fill_(0.)
+            elif mtype == nn.BatchNorm2d.__module__:
+                nn.init.uniform_(module.weight.data)  # gamma == weight here
+                module.bias.data.fill_(0.)  # beta == bias here
+            elif list(module.parameters(recurse=False)) and list(module.children()):
+                raise Exception("ERROR: Some module(s) which have parameter(s) havn't bee explicitly initialized.")
+        self.apply(_initialize_weights)
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-        x = self._conv_layers(x)  # Process backbone features
-        x = tu.flatten_batch(x)
-        x = self._fc_layers(x)  # Apply fully connected head neural net
+        x = self._layers(x)  # Apply whole neural net architecture
 
         pos_logits = x[:, :self._p_output_size]  # infered positions: logits from a log_softmax layer
         bbs = x[:, self._p_output_size:]  # bounding boxes (no activation function)
-
-        # TODO: use data à-priori/redoundancy for better inference results. E.g. by zeroing bounding boxes for which position is 0...
         return pos_logits, bbs
 
 
-# TODO: add path parameter for dataset dir
-def init_training(batch_size: int, architecture: dict, optimizer_params: dict, scheduler_params: dict) -> Tuple[DataLoader, DataLoader, nn.Module, Optimizer, _LRScheduler]:
+def train(batch_size: int, architecture: dict, optimizer_params: dict, scheduler_params: dict, bce_loss_scale: float, epochs: int, early_stopping: Optional[int] = None, pbar: bool = True) -> Tuple[float, float, int]:
     """ Initializes dataset, dataloaders, model, optimizer and lr_scheduler for future training """
+    # TODO: refactor this to avoid some duplicated code with seq_prediction.init_training()
+    # TODO: add path parameter for dataset dir
     # Create balls dataset
-    dataset = datasets.BallsCFDetection(SOURCE_DIR.joinpath("../../datasets/mini_balls"), img_transform=F.normalize)
+    dataset = datasets.BallsCFDetection(tu.source_dir() / r'../../datasets/mini_balls')
 
     # Create ball detector model and dataloaders
-    trainset, validset = datasets.create_dataloaders(dataset, batch_size, INFERENCE_BATCH_SIZE)
+    trainset, validset = datasets.create_dataloaders(dataset, batch_size)
     dummy_img, p, bb = dataset[0]  # Nescessary to retreive input image resolution (assumes all dataset images are of the same size)
     model = BallDetector(dummy_img.shape, (np.prod(p.shape), np.prod(bb.shape)), **architecture)
+    model.init_params()
     if batch_size > 64:
         model = tu.parrallelize(model)
+    model.train(True).to(DEVICE)
+    print(f'> MODEL ARCHITECTURE:\n{model.__repr__()}')
+    print(f'> MODEL CONVOLUTION FEATURE SIZES: {model._conv_features_shapes}')
 
-    # Define optimizer and LR scheduler
+    # Define optimizer, loss and LR scheduler
     optimizer = torch.optim.Adam(model.parameters(), **optimizer_params)
-    #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, steps_per_epoch=len(trainset), epochs=hp['epochs'], **scheduler_params)
+    bb_metric, pos_metric = torch.nn.MSELoss(), torch.nn.BCEWithLogitsLoss()
     scheduler_params['step_size'] *= len(trainset)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, **scheduler_params)
-    return trainset, validset, model, optimizer, scheduler
+    # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, steps_per_epoch = len(trainset), epochs = hp['epochs'], **scheduler_params)
 
-
-def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimizer: optim.Optimizer, scheduler: optim.lr_scheduler._LRScheduler, epochs: int, early_stopping: Optional[int] = None, pbar: bool = True) -> Tuple[float, float, int]:
-    """ Trains model on given dataset """
-    model.train(True).to(DEVICE)
-    bb_metric, pos_metric = torch.nn.MSELoss(), torch.nn.BCEWithLogitsLoss()
-    shutil.rmtree(VIS_DIR)
-    VIS_DIR.mkdir(parents=True)
-
-    # Weight xavier initialization
-    def _initialize_weights(module):
-        if isinstance(module, nn.Conv2d):
-            nn.init.xavier_normal_(module.weight.data, gain=1.)
-    model.apply(_initialize_weights)
+    # Create directory for results visualization
+    if VIS_DIR is not None:
+        shutil.rmtree(VIS_DIR, ignore_errors=True)
+        VIS_DIR.mkdir(parents=True)
 
     best_valid_loss, best_train_loss = float("inf"), float("inf")
     best_run_epoch = -1
@@ -129,18 +157,17 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
             def closure():
                 optimizer.zero_grad()
                 output_colors, output_bbs = model(batch_x)
-                loss = pos_metric(output_colors, colors) + bb_metric(output_bbs, bbs)
+                loss = bce_loss_scale * pos_metric(output_colors, colors) + bb_metric(output_bbs, bbs)
                 loss.backward()
                 return loss
-            loss = optimizer.step(closure).detach()
+            loss = float(optimizer.step(closure).clone().detach())
             scheduler.step()
             train_loss += loss / len(trainset)
-            update_bar(trainLoss=f'{len(trainset) * train_loss / trange.n:.7f}', lr=f'{scheduler.get_lr()[0]:.3E}')
+            update_bar(trainLoss=f'{len(trainset) * train_loss / (trange.n + 1):.7f}', lr=f'{float(scheduler.get_lr()[0]):.3E}')
 
         print(f'>\tDone: TRAIN_LOSS = {train_loss:.7f}')
-        valid_loss = evaluate(epoch, model, validset, pbar=pbar)
+        valid_loss = evaluate(epoch, model, validset, bce_loss_scale, best_valid_loss, pbar=pbar)
         print(f'>\tDone: VALID_LOSS = {valid_loss:.7f}')
-
         if best_valid_loss > valid_loss:
             print('>\tBest valid_loss found so far, saving model...')  # TODO: save model
             best_valid_loss, best_train_loss = valid_loss, train_loss
@@ -152,11 +179,11 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
                 print(f'>\tModel not improving: Ran {epochs_since_best_loss} training epochs without improvement. Early stopping training loop...')
                 break
 
-    print(f'>\tBest training results obtained at {best_run_epoch}nth epoch (best_valid_loss={best_valid_loss:.7f}, best_train_loss={best_train_loss:.7f}).')
+    print(f'>\tBest training results obtained at {best_run_epoch}nth epoch (best_valid_loss = {best_valid_loss:.7f}, best_train_loss = {best_train_loss:.7f}).')
     return best_train_loss, best_valid_loss, best_run_epoch
 
 
-def evaluate(epoch: int, model: nn.Module, validset: DataLoader, pbar: bool = True) -> float:
+def evaluate(epoch: int, model: nn.Module, validset: DataLoader, bce_loss_scale: float, best_valid_loss: float, pbar: bool = True) -> float:
     model.eval()
     with torch.no_grad():
         bb_metric, pos_metric = torch.nn.MSELoss(), torch.nn.BCEWithLogitsLoss()
@@ -165,23 +192,23 @@ def evaluate(epoch: int, model: nn.Module, validset: DataLoader, pbar: bool = Tr
         for (batch_x, colors, bbs) in tu.progess_bar(validset, '> Evaluation on validset', min(len(validset.dataset), validset.batch_size), disable=not pbar):
             batch_x, colors, bbs = batch_x.to(DEVICE), tu.flatten_batch(colors.to(DEVICE)), tu.flatten_batch(bbs.to(DEVICE))
             output_colors, output_bbs = model(batch_x)
-            valid_loss += (pos_metric(output_colors, colors) + bb_metric(output_bbs, bbs)) / len(validset)
+            valid_loss += (bce_loss_scale * pos_metric(output_colors, colors) + bb_metric(output_bbs, bbs)) / len(validset)
 
-            if first_step:
+            if first_step and VIS_DIR is not None and best_valid_loss >= valid_loss:
                 first_step = False
-                for idx in [0, 45, 77, 89, 99, 122, 220]:
-                    print(f"> ! Saving visualization image of inference on {idx}th validset value...")
+                print(f"> ! Saving visualization images of inference on some validset values...")
+                for idx in np.random.permutation(range(validset.batch_size))[:8]:
                     img, bbs, _cols = datasets.retrieve_data(batch_x[idx], output_bbs[idx], output_colors[idx])
-                    vis.show_bboxes(img, bbs, datasets.COLORS, out_fn=VIS_DIR / f'vis_epoch_{epoch}_valid_{idx}.png')
+                    vis.show_bboxes(img, bbs, datasets.COLORS, out_fn=VIS_DIR / f'vis_valid_{idx}.png')
     return float(valid_loss)
 
 # TODO: finalize saving implementation
 # def save_experiment(save_dir: Path, model: nn.Module, hyperparameters: Optional[dict] = None, eval_metrics: Optional[dict] = None, train_metrics: Optional[dict] = None):
 #     """ Saves a pytorch model along with experiment information like hyperparameters, test metrics and training metrics """
 #     if not save_dir.is_dir():
-#         logging.warning(f'Replacing existing directory during model snaphshot saving process. (save_dir="{save_dir}")')
+#         logging.warning(f'Replacing existing directory during model snaphshot saving process. (save_dir = "{save_dir}")')
 #         save_dir.rmdir()
-#     save_dir.parent.mkdir(parents=True, exist_ok=True)
+#     save_dir.parent.mkdir(parents = True, exist_ok = True)
 
 #     model_name = model._get_name()
 #     meta = {'model_name': model_name,
@@ -189,7 +216,7 @@ def evaluate(epoch: int, model: nn.Module, validset: DataLoader, pbar: bool = Tr
 #             'absolute_save_path': save_dir.resolve(),
 #             'metadata_filename': f'{model_name}_metadata.json'}
 
-#     torch.save(model.state_dict(), save_dir.joinpath(meta['model_filename']))
+#     torch.save(model.state_dict(), save_dir / meta['model_filename']))
 
 #     if eval_metrics is not None and len(eval_metrics) > 0:
 #         meta['eval_metrics'] = json.dumps(eval_metrics)
@@ -207,7 +234,7 @@ def evaluate(epoch: int, model: nn.Module, validset: DataLoader, pbar: bool = Tr
     # Store training and evaluation metrics and some informatations about the snapshot into json file
 
 
-# def _log_eval_results(results, type, JSON_log, JSON_log_template='./eval_log_template.json'):
+# def _log_eval_results(results, type, JSON_log, JSON_log_template = './eval_log_template.json'):
 #     print("> Storing evaluation results to " + JSON_log)
 
 #     if not os.path.isfile(JSON_log):

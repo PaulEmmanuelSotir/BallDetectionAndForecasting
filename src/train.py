@@ -25,14 +25,16 @@ torch.backends.cudnn.deterministic = True
 cudnn.benchmark = torch.cuda.is_available()  # Enable builtin CuDNN auto-tuner, TODO: benchmarking isn't deterministic, disable this if this is an issue
 cudnn.fastest = torch.cuda.is_available()  # Disable this if memory issues
 
-# Define hyperparameters
-EPOCHS = 350
-EARLY_STOPPING = 30
-DETECTOR_HP = {
-    'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 9.9615e-05, 'weight_decay': 2.11924e-4},
-    'scheduler_params': {'step_size': 40, 'gamma': 0.2},
+
+# Previous hyperparameters obtained from first hyperparamter search
+DETECTOR_HP_OLD = {
+    'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 5*5*9.9615e-05, 'weight_decay': 2.11924e-4},
+    'scheduler_params': {'step_size': 20, 'gamma': 0.2},
     # 'scheduler_params': {'max_lr': 1e-2, 'pct_start': 0.3, 'anneal_strategy': 'cos'},
     'batch_size': 32,
+    'bce_loss_scale': 0.1,
+    'early_stopping': 30,
+    'epochs': 350,
     'architecture': {
         'act_fn': nn.LeakyReLU,
         # 'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
@@ -48,18 +50,79 @@ DETECTOR_HP = {
     }
 }
 
-SEQ_PRED_HP = {
-    'optimizer_params': {'lr': 8e-5, 'betas': (0.9, 0.999), 'eps': 1e-8, 'weight_decay': 1e-5, 'amsgrad': False},
+# Detection hyperparameters obtained from last hyperparamter search
+DETECTOR_HP_OLD2 = {
+    'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 5*9.40323e-05, 'weight_decay': 1e-3},
     'scheduler_params': {'step_size': 40, 'gamma': 0.2},
-    # 'scheduler_params': {'max_lr': 1e-2, 'pct_start': 0.3, 'anneal_strategy': 'cos'},
-    'batch_size': 64,
+    'batch_size': 32,
+    'bce_loss_scale': 0.1,
+    'early_stopping': 30,
+    'epochs': 350,
     'architecture': {
-        'act_fn': nn.LeakyReLU,
-        # TODO: Avoid enabling both dropout and batch normalization at the same time: see ...
-        'dropout_prob': 0.55,
-        # 'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
-        # Fully connected network hyperparameters (a final FC inference layer with no dropout nor batchnorm will be added when ball position predictor model is instantiated)
-        'fc_params': [{'out_features': 512}, {'out_features': 256}, {'out_features': 128}, {'out_features': 128}]}
+        'act_fn': nn.ReLU,
+        'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
+        'dropout_prob': 0.,
+        'layers_param': (
+            # Conv2d backbone layers
+            ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+            ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+            ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+            ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+            ('conv2d', {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 0}),
+            ('conv2d', {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 0}),
+            ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+            ('conv2d', {'out_channels': 32, 'kernel_size': (5, 5), 'padding': 2}),
+            ('conv2d', {'out_channels': 32, 'kernel_size': (7, 7), 'padding': 3}),
+            ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+            ('conv2d', {'out_channels': 64, 'kernel_size': (5, 5), 'padding': 2}),
+            ('flatten', {}),
+            ('fully_connected', {}))  # Last logits layer parameterized int balldetect.BallDetector.__init__ (no droupout, batch_norm nor activation function)
+    }
+}
+
+DETECTOR_HP = {
+    'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 2*9.40323e-05, 'weight_decay': 1e-6},
+    'scheduler_params': {'step_size': 20, 'gamma': 0.5},
+    'batch_size': 64,
+    'bce_loss_scale': 0.1,
+    'early_stopping': 30,
+    'epochs': 350,
+    'architecture': {
+        'act_fn': nn.ReLU,
+        'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
+        'dropout_prob': 0.,
+        'layers_param': (
+            # Conv2d backbone layers
+            ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+            ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+            ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+            ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+            ('conv2d', {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 0}),
+            ('conv2d', {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 0}),
+            ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+            ('conv2d', {'out_channels': 32, 'kernel_size': (5, 5), 'padding': 2}),
+            ('conv2d', {'out_channels': 32, 'kernel_size': (7, 7), 'padding': 3}),
+            ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+            ('conv2d', {'out_channels': 64, 'kernel_size': (5, 5), 'padding': 2}),
+            ('flatten', {}),
+            ('fully_connected', {}))  # Last logits layer parameterized int balldetect.BallDetector.__init__ (no droupout, batch_norm nor activation function)
+        # Linear head layers
+        # ('fully_connected', {'out_features': 64}),
+        # ('fully_connected', {'out_features': 128}))
+    }
+}
+
+# Forecasting hyperparameters obtained from hyperparamter search
+SEQ_PRED_HP = {
+    'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 5*9.066e-05, 'weight_decay': 2.636e-06},
+    'scheduler_params': {'step_size': 30, 'gamma': 0.3},
+    'batch_size': 32,
+    'early_stopping': 30,
+    'epochs': 350,
+    'architecture': {
+        'act_fn': nn.Tanh,
+        'dropout_prob': 0.,
+        'fc_params': ({'out_features': 512}, {'out_features': 256}, {'out_features': 128}, {'out_features': 128})}
 }
 
 
@@ -75,15 +138,13 @@ def main():
 
     if train_model == _DETECT:
         print('> Initializing and training ball detection model (mini_balls dataset)...')
-        training_objs = ball_detector.init_training(**DETECTOR_HP)
-        _best_train_loss, _best_valid_loss, _best_epoch = ball_detector.train(*training_objs, epochs=EPOCHS, early_stopping=EARLY_STOPPING)
-        # TODO: ball_detector.save_experiment(Path(r'../models/task1_experiments/train_0001/'), model, hp)
+        ball_detector.train(**DETECTOR_HP)
+        # TODO: save model: ball_detector.save_experiment(Path(r'../models/task1_experiments/train_0001/'), model, hp)
 
     elif train_model == _FORECAST:
         print('> Initializing and training ball position forecasting model (mini_balls dataset)...')
-        training_objs = seq_prediction.init_training(**SEQ_PRED_HP)
-        _best_train_loss, _best_valid_loss, _best_epoch = seq_prediction.train(*training_objs, epochs=EPOCHS, early_stopping=EARLY_STOPPING)
-        # TODO: save pred_seq
+        seq_prediction.train(**SEQ_PRED_HP)
+        # TODO: save model
 
 
 if __name__ == "__main__":

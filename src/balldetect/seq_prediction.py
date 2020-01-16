@@ -26,8 +26,6 @@ __all__ = ['SeqPredictor', 'train']
 __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
 DEVICE = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-INFERENCE_BATCH_SIZE = 16*1024  # Batch size used during inference (including validset evaluation)
-
 
 class SeqPredictor(nn.Module):
     """ Ball position sequence forecasting pytorch module (fully connected neural net).
@@ -36,7 +34,7 @@ class SeqPredictor(nn.Module):
 
     __constants__ = ['_input_shape', '_n_classes']
 
-    def __init__(self, input_shape: torch.Size, n_classes: int, fc_params: list, act_fn: type = nn.ReLU, dropout_prob: float = 0., batch_norm: dict = {}):
+    def __init__(self, input_shape: torch.Size, n_classes: int, fc_params: list, act_fn: type = nn.ReLU, dropout_prob: float = 0., batch_norm: Optional[dict] = None):
         super(SeqPredictor, self).__init__()
         self._input_shape = input_shape
         self._n_classes = n_classes
@@ -56,43 +54,37 @@ class SeqPredictor(nn.Module):
         return self._net(x)  # Apply fully connected head neural net
 
 
-def init_training(batch_size: int, architecture: dict, optimizer_params: dict, scheduler_params: dict) -> Tuple[DataLoader, DataLoader, nn.Module, Optimizer, _LRScheduler]:
-    """ Initializes dataset, dataloaders, model, optimizer and lr_scheduler for future training """
+def train(batch_size: int, architecture: dict, optimizer_params: dict, scheduler_params: dict, epochs: int, early_stopping: Optional[int] = None, pbar: bool = True) -> Tuple[float, float, int]:
+    """ Initializes and train seq forecasting model """
     # TODO: refactor this to avoid some duplicated code with ball_detector.init_training()
     # Create balls dataset
-    dir_path = Path(os.path.dirname(os.path.realpath(__file__)))
-    dataset = datasets.BallsCFSeq(dir_path.joinpath("../../datasets/mini_balls_seq"))
+    dataset = datasets.BallsCFSeq(tu.source_dir() / r'../../datasets/mini_balls_seq')
 
     # Create ball detector model and dataloaders
-    trainset, validset = datasets.create_dataloaders(dataset, batch_size, INFERENCE_BATCH_SIZE)
+    trainset, validset = datasets.create_dataloaders(dataset, batch_size)
     input_bb_sequence, colors, target_bb = dataset[0]  # Nescessary to retreive input image resolution (assumes all dataset images are of the same size)
     model = SeqPredictor(np.prod(input_bb_sequence.shape) + np.prod(colors.shape), np.prod(target_bb.shape), **architecture)
     if batch_size > 64:
         model = tu.parrallelize(model)
+    model.train(True).to(DEVICE)
 
-    # Define optimizer and LR scheduler
+    # Define optimizer, loss and LR scheduler
     optimizer = torch.optim.Adam(model.parameters(), **optimizer_params)
-    # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, steps_per_epoch=len(trainset), epochs=hp['epochs'], **scheduler_params)
+    mse = torch.nn.MSELoss()
     scheduler_params['step_size'] *= len(trainset)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, **scheduler_params)
-    return trainset, validset, model, optimizer, scheduler
-
-
-def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimizer: optim.Optimizer, scheduler: optim.lr_scheduler._LRScheduler, epochs: int, early_stopping: Optional[int] = None, pbar: bool = True) -> Tuple[float, float, int]:
-    """ Trains model on given dataset """
-    # TODO: refactor this to avoid some duplicated code with ball_detector.train()
-    model.train(True).to(DEVICE)
-    mse = torch.nn.MSELoss()
+    # scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, steps_per_epoch=len(trainset), epochs=hp['epochs'], **scheduler_params)
+    
+    # Weight xavier initialization
+    def _initialize_weights(module):
+        if isinstance(module, nn.Linear):
+            # TODO: adapt this line according to act fn in hyperprameteres (like in BallDetector model)
+            nn.init.xavier_normal_(module.weight.data, gain=nn.init.calculate_gain(tu.get_gain_name(nn.Tanh)))
+    model.apply(_initialize_weights)
 
     best_valid_mse, best_train_mse = float("inf"), float("inf")
     best_run_epoch = -1
     epochs_since_best_loss = 0
-
-    # Weight xavier initialization
-    def _initialize_weights(module):
-        if isinstance(module, nn.Conv2d):
-            nn.init.xavier_normal_(module.weight.data, gain=1.)
-    model.apply(_initialize_weights)
 
     # Main training loop
     for epoch in range(1, epochs + 1):
@@ -100,7 +92,7 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
         train_mse = 0
 
         trange, update_bar = tu.progess_bar(trainset, '> Training on trainset', trainset.batch_size, custom_vars=True, disable=not pbar)
-        for (input_bb_sequence, colors, target_bb) in trange:
+        for i, (input_bb_sequence, colors, target_bb) in enumerate(trange):
             batch_x = torch.cat((tu.flatten_batch(input_bb_sequence.to(DEVICE)).T, colors.to(DEVICE).T)).T.requires_grad_(True)
             target_bb = tu.flatten_batch(target_bb.to(DEVICE))
 
@@ -110,10 +102,10 @@ def train(trainset: DataLoader, validset: DataLoader, model: nn.Module, optimize
                 loss = mse(output, target_bb)
                 loss.backward()
                 return loss
-            loss = optimizer.step(closure)
+            loss = float(optimizer.step(closure).clone().detach())
             scheduler.step()
             train_mse += loss / len(trainset)
-            update_bar(trainMSE=f'{len(trainset) * train_mse / trange.n:.7f}', lr=f'{scheduler.get_lr()[0]:.3E}')
+            update_bar(trainMSE=f'{len(trainset) * train_mse / (trange.n + 1):.7f}', lr=f'{float(scheduler.get_lr()[0]):.3E}')
 
         print(f'\tDone: TRAIN_MSE = {train_mse:.7f}')
         valid_loss = evaluate(model, validset, pbar=pbar)

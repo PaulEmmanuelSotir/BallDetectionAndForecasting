@@ -4,14 +4,9 @@
 .. moduleauthor:: Fabien Baradel, Paul-Emmanuel Sotir, Christian Wolf  
 .. See https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html and https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting  
 """
-import os
-import numpy as np
-import argparse
-import random
-from PIL import Image
-from torch.utils.data import DataLoader
 from PIL import Image, ImageDraw
 
+import balldetect.torch_utils as tu
 from balldetect.datasets import BallsCFDetection, COLORS
 
 __all__ = ['show_img', 'show_bboxes']
@@ -46,15 +41,15 @@ def show_bboxes(rgb_array, np_bbox, list_colors, out_fn='./bboxes_on_rgb.png'):
         x_1, y_1, x_2, y_2 = np_bbox[i]
         draw.rectangle(((x_1, y_1), (x_2, y_2)), outline=color, fill=None)
 
-    # img_rgb.show()
+    # img_rgb.show()  # TODO: make sure there is a runing graphical server before calling this?
     img_rgb.save(out_fn)
 
 
 if __name__ == "__main__":
-    dataset = BallsCFDetection("../mini_balls/train", 20999)
+    dataset = BallsCFDetection(tu.source_dir() / r'../datasets/mini_balls/')
 
     # Get a single image from the dataset and display it
-    img, p, pose = dataset.__getitem__(2)
+    img, pose, p = dataset.__getitem__(2)
 
     print(img.shape)
     print(pose.shape)

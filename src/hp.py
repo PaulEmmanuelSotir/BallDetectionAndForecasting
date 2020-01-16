@@ -13,17 +13,14 @@ from hyperopt import fmin, tpe, space_eval, Trials, hp
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
-from torch.nn.modules.activation import ReLU, Tanh
-from balldetect.ball_detector import train
 
-import balldetect.torch_utils as torch_utils
+import balldetect.torch_utils as tu
 import balldetect.ball_detector as ball_detector
 import balldetect.seq_prediction as seq_prediction
+pickle = tu.import_pickle()
 
 __author__ = 'Paul-Emmanuel SOTIR <paul-emmanuel@outlook.com>'
 
-EPOCHS = 90
-EARLY_STOPPING = 12
 HP_SEARCH_EVALS = 100
 HP_SEARCH_ALGO = tpe.suggest
 
@@ -33,28 +30,6 @@ cudnn.benchmark = torch.cuda.is_available()  # Enable builtin CuDNN auto-tuner, 
 cudnn.fastest = torch.cuda.is_available()  # Disable this if memory issues
 
 
-def get_objective(model_module: types.ModuleType, train_model_name: str):
-    def _objective(params: dict) -> float:
-        print('\n' + '#' * 20 + f' {train_model_name.upper()} HYPERPARAMETERS TRIAL  ' + '#' * 20 + f'\n{params}')
-        torch_utils.set_seeds()  # Set seeds for better repducibility
-
-        # Train ball detector model
-        training_objs = model_module.init_training(**params)
-        _, valid_loss, _ = model_module.train(*training_objs, epochs=EPOCHS, early_stopping=EARLY_STOPPING, pbar=False)
-        return valid_loss
-    return _objective
-
-
-def forecast_objective(params: dict) -> float:
-    print('\n' + '#' * 20 + ' FORECAST HYPERPARAMETERS TRIAL  ' + '#' * 20)
-    torch_utils.set_seeds()  # Set seeds for better repducibility
-
-    # Train ball detector model
-    training_objs = seq_prediction.init_training(**params)
-    _, valid_loss, _ = seq_prediction.train(*training_objs, epochs=EPOCHS, early_stopping=EARLY_STOPPING, pbar=False)
-    return valid_loss
-
-
 def main():
     # Parse arguments
     _DETECT, _FORECAST = 'detect', 'forecast'
@@ -62,64 +37,60 @@ def main():
     parser.add_argument('--model', nargs=1, type=str, required=True, choices=[_DETECT, _FORECAST],
                         help=f'Determines model to train ("{_DETECT}" or "{_FORECAST}").')
     train_model = parser.parse_args().model[0]
+    TRIALS_FILEPATH = tu.source_dir(__file__) / f'../hp_trials_{train_model}.pkl'
 
-    # Define hyperparameter search space for ball detector (task 1)
+    # Ball detector Conv2d backbone layers
+    conv_backbone = (
+        ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+        ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+        ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
+        ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+        ('conv2d', {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 0}),
+        ('conv2d', {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 0}),
+        ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+        ('conv2d', {'out_channels': 32, 'kernel_size': (5, 5), 'padding': 2}),
+        ('conv2d', {'out_channels': 32, 'kernel_size': (7, 7), 'padding': 3}),
+        ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
+        ('conv2d', {'out_channels': 64, 'kernel_size': (5, 5), 'padding': 2}),
+        ('flatten', {}))
+
+    # Define hyperparameter search space (second hp search space iteration) for ball detector (task 1)
     detect_hp_space = {
-        'optimizer_params': {'lr': hp.uniform('lr', 5e-6, 1e-4), 'betas': (0.9, 0.999), 'eps': 1e-8,
-                             'weight_decay': hp.loguniform('weight_decay', math.log(1e-7), math.log(1e-3)), 'amsgrad': False},
-        'scheduler_params': {'step_size': EPOCHS, 'gamma': 1.},
+        'optimizer_params': {'lr': hp.uniform('lr', 1e-6, 1e-3), 'betas': (0.9, 0.999), 'eps': 1e-8,
+                             'weight_decay': hp.loguniform('weight_decay', math.log(1e-7), math.log(3e-3)), 'amsgrad': False},
+        'scheduler_params': {'step_size': 40, 'gamma': .3},
         # 'scheduler_params': {'max_lr': 1e-2, 'pct_start': 0.3, 'anneal_strategy': 'cos'},
-        'batch_size': hp.choice('batch_size', [32, 64, 128]),
+        'batch_size': hp.choice('batch_size', [16, 32, 64]),
+        'bce_loss_scale': 0.1,
+        'early_stopping': 12,
+        'epochs': 90,
         'architecture': {
-            'act_fn': nn.LeakyReLU,
-            # TODO: Avoid enabling both dropout and batch normalization at the same time: see ...
-            'dropout_prob': hp.choice('dropout_prob', [1., hp.uniform('nonzero_dropout_prob', 0.45, 0.8)]),
-            # 'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
-            # Convolutional backbone block hyperparameters
-            'conv2d_params': hp.choice('conv2d_params', [
-                [{'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1, 'stride': 2},
-                 {'out_channels': 8, 'kernel_size': (5, 5), 'padding': 2},
-                 {'out_channels': 8, 'kernel_size': (7, 7), 'padding': 3}],
-
-                [{'out_channels': 2, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1, 'stride': 2},
-                 {'out_channels': 8, 'kernel_size': (5, 5), 'padding': 2},
-                 {'out_channels': 8, 'kernel_size': (5, 5), 'padding': 2, 'stride': 2},
-                 {'out_channels': 16, 'kernel_size': (7, 7), 'padding': 3}],
-
-                [{'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 8, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 8, 'kernel_size': (3, 3), 'padding': 1, 'stride': 2},
-                 {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 2}],
-
-                [{'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 1, 'stride': 4},
-                 {'out_channels': 8, 'kernel_size': (3, 3), 'padding': 1},
-                 {'out_channels': 8, 'kernel_size': (3, 3), 'padding': 1}]
-            ]),
-            # Fully connected head block hyperparameters (a final FC inference layer with no dropout nor batchnorm will be added when ball detector model is instantiated)
-            'fc_params': hp.choice('fc_params', [[{'out_features': 64}],
-                                                 [{'out_features': 64}, {'out_features': 128}],
-                                                 []])}
+            'act_fn': nn.ReLU,
+            'batch_norm': {'eps': 1e-05, 'momentum': hp.uniform('momentum', 0.05, 0.15), 'affine': True},
+            'dropout_prob': hp.choice('dropout_prob', [0., hp.uniform('nonzero_dropout_prob', 0.1, 0.45)]),
+            'layers_param': hp.choice('layers_param', [(*conv_backbone, ('fully_connected', {'out_features': 64}),
+                                                        ('fully_connected', {})),
+                                                       (*conv_backbone, ('fully_connected', {'out_features': 64}),
+                                                        ('fully_connected', {'out_features': 128}),
+                                                        ('fully_connected', {})),
+                                                       (*conv_backbone, ('fully_connected', {'out_features': 128}),
+                                                        ('fully_connected', {'out_features': 128}),
+                                                        ('fully_connected', {})),
+                                                       (*conv_backbone, ('fully_connected', {}))])
+        }
     }
 
     # Define hyperparameter search space for ball position forecasting (task 2)
     forecast_hp_space = {
         'optimizer_params': {'lr': hp.uniform('lr', 5e-6, 1e-4), 'betas': (0.9, 0.999), 'eps': 1e-8, 'weight_decay': hp.loguniform('weight_decay', math.log(1e-7), math.log(1e-2)), 'amsgrad': False},
-        'scheduler_params': {'step_size': EPOCHS, 'gamma': 1.},
+        'scheduler_params': {'step_size': 30, 'gamma': .3},
         # 'scheduler_params': {'max_lr': 1e-2, 'pct_start': 0.3, 'anneal_strategy': 'cos'},
-        'batch_size': hp.choice('batch_size', [32, 64, 128]),
+        'batch_size': hp.choice('batch_size', [16, 32, 64]),
+        'early_stopping': 12,
+        'epochs': 90,
         'architecture': {
-            'act_fn': hp.choice('act_fn', [nn.LeakyReLU, nn.ReLU, nn.Tanh]),
-            # TODO: Avoid enabling both dropout and batch normalization at the same time: see ...
-            'dropout_prob': hp.choice('dropout_prob', [1., hp.uniform('nonzero_dropout_prob', 0.45, 0.8)]),
-            # 'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
+            'act_fn': nn.Tanh,
+            'dropout_prob': hp.choice('dropout_prob', [0., hp.uniform('nonzero_dropout_prob', 0.1, 0.45)]),
             # Fully connected network hyperparameters (a final FC inference layer with no dropout nor batchnorm will be added when ball position predictor model is instantiated)
             'fc_params': hp.choice('fc_params', [[{'out_features': 512}, {'out_features': 256}] + [{'out_features': 128}] * 2,
                                                  [{'out_features': 128}] + [{'out_features': 256}] * 2 + [{'out_features': 512}],
@@ -130,27 +101,47 @@ def main():
     }
 
     if train_model == _DETECT:
-        print('Running hyperparameter search for ball detection model (mini_balls dataset)...')
         hp_space = detect_hp_space
-        objective = get_objective(ball_detector, train_model)
+        model_module = ball_detector
     elif train_model == _FORECAST:
-        print('Running hyperparameter search for ball position forecasting model (mini_balls_seq dataset)...')
         hp_space = forecast_hp_space
-        objective = get_objective(seq_prediction, train_model)
+        model_module = seq_prediction
     else:
+        print('ERROR: bad model_name provided')  # TODO: logging.error
         exit(-1)
 
+    # Define hp search objective (runs one hyperparameter trial)
+    def _objective(params: dict) -> float:
+        print('\n' + '#' * 20 + f' {train_model.upper()} HYPERPARAMETERS TRIAL  ' + '#' * 20 + f'\n{params}')
+        # Set seeds for better repducibility
+        tu.set_seeds()
+        # Train ball detector model
+        _, valid_loss, _ = model_module.train(**params, pbar=False)
+        return valid_loss
+
+    print(f'Running hyperparameter search for "{train_model}" model (mini_balls_seq dataset)...')
     trials = Trials()
-    best_parameters = fmin(objective,
+    best_parameters = fmin(_objective,
                            algo=HP_SEARCH_ALGO,
                            max_evals=HP_SEARCH_EVALS,
                            space=hp_space,
                            trials=trials)
 
-    print('\n\n' + '#' * 20 + '  BEST HYPERPARAMETERS  ' + '#' * 20)
-    print(best_parameters)
-    print('\n\n' + '#' * 20 + '  BEST HYPERPARAMETERS  ' + '#' * 20)
+    print('\n\n' + '#' * 20 + f'  BEST HYPERPARAMETERS ({train_model.upper()})  ' + '#' * 20)
     print(space_eval(hp_space, best_parameters))
+
+    print('\n\n' + '#' * 20 + f'  TRIALS  ({train_model.upper()})  ' + '#' * 20)
+    print(trials)
+
+    print('\n\n' + '#' * 20 + f'  TRIALS.results  ({train_model.upper()})  ' + '#' * 20)
+    print(trials.results)
+
+    print('\n\n' + '#' * 20 + f'  TRIALS.results  ({train_model.upper()})  ' + '#' * 20)
+    print(trials.best_trial)
+
+    print('Saving trials with pickle...')
+    with open(TRIALS_FILEPATH, 'wb') as f:
+        pickle.dump(trials, f)
 
 
 if __name__ == '__main__':
