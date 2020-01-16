@@ -48,51 +48,6 @@ DETECTOR_HP = {
     }
 }
 
-# DETECTOR_HP = {
-#     'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 2*9.40323e-05, 'weight_decay': 1e-6},
-#     'scheduler_params': {'step_size': 20, 'gamma': 0.5},
-#     'batch_size': 64,
-#     'bce_loss_scale': 0.1,
-#     'early_stopping': 30,
-#     'epochs': 350,
-#     'architecture': {
-#         'act_fn': nn.ReLU,
-#         'batch_norm': {'eps': 1e-05, 'momentum': 0.1, 'affine': True},
-#         'dropout_prob': 0.,
-#         'layers_param': (
-#             # Conv2d backbone layers
-#             ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
-#             ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
-#             ('conv2d', {'out_channels': 4, 'kernel_size': (3, 3), 'padding': 0}),
-#             ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
-#             ('conv2d', {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 0}),
-#             ('conv2d', {'out_channels': 16, 'kernel_size': (5, 5), 'padding': 0}),
-#             ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
-#             ('conv2d', {'out_channels': 32, 'kernel_size': (5, 5), 'padding': 2}),
-#             ('conv2d', {'out_channels': 32, 'kernel_size': (7, 7), 'padding': 3}),
-#             ('avg_pooling', {'kernel_size': (2, 2), 'stride': (2, 2)}),
-#             ('conv2d', {'out_channels': 64, 'kernel_size': (5, 5), 'padding': 2}),
-#             ('flatten', {}),
-#             ('fully_connected', {}))  # Last logits layer parameterized int balldetect.BallDetector.__init__ (no droupout, batch_norm nor activation function)
-#         # Linear head layers
-#         # ('fully_connected', {'out_features': 64}),
-#         # ('fully_connected', {'out_features': 128}))
-#     }
-# }
-
-# Forecasting hyperparameters obtained from hyperparamter search
-# SEQ_PRED_HP = {
-#     'optimizer_params': {'amsgrad': False, 'betas': (0.9, 0.999), 'eps': 1e-08, 'lr': 5*9.066e-05, 'weight_decay': 2.636e-06},
-#     'scheduler_params': {'step_size': 30, 'gamma': 0.3},
-#     'batch_size': 32,
-#     'early_stopping': 30,
-#     'epochs': 350,
-#     'architecture': {
-#         'act_fn': nn.Tanh,
-#         'dropout_prob': 0.,
-#         'fc_params': ({'out_features': 512}, {'out_features': 256}, {'out_features': 128}, {'out_features': 128})}
-# }
-
 SEQ_PRED_HP = {
     'batch_size': 16,
     'early_stopping': 30,

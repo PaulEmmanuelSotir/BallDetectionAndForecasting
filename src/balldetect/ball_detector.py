@@ -187,15 +187,14 @@ def evaluate(epoch: int, model: nn.Module, validset: DataLoader, bce_loss_scale:
     model.eval()
     with torch.no_grad():
         bb_metric, pos_metric = torch.nn.MSELoss(), torch.nn.BCEWithLogitsLoss()
-        valid_loss, first_step = 0., True
+        valid_loss = 0.
 
-        for (batch_x, colors, bbs) in tu.progess_bar(validset, '> Evaluation on validset', min(len(validset.dataset), validset.batch_size), disable=not pbar):
+        for step, (batch_x, colors, bbs) in enumerate(tu.progess_bar(validset, '> Evaluation on validset', min(len(validset.dataset), validset.batch_size), disable=not pbar)):
             batch_x, colors, bbs = batch_x.to(DEVICE), tu.flatten_batch(colors.to(DEVICE)), tu.flatten_batch(bbs.to(DEVICE))
             output_colors, output_bbs = model(batch_x)
             valid_loss += (bce_loss_scale * pos_metric(output_colors, colors) + bb_metric(output_bbs, bbs)) / len(validset)
 
-            if first_step and VIS_DIR is not None and best_valid_loss >= valid_loss:
-                first_step = False
+            if step >= len(validset) - 1 and VIS_DIR is not None and best_valid_loss >= valid_loss:
                 print(f"> ! Saving visualization images of inference on some validset values...")
                 for idx in np.random.permutation(range(validset.batch_size))[:8]:
                     img, bbs, _cols = datasets.retrieve_data(batch_x[idx], output_bbs[idx], output_colors[idx])
