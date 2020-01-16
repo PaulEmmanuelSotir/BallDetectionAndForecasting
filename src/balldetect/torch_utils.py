@@ -127,7 +127,7 @@ def source_dir(source_file: str = __file__) -> Path:
     return Path(os.path.dirname(os.path.realpath(source_file)))
 
 
-def extract_from_hp_search_log(log_path: Path) -> Tuple[List[dict], int, dict]:
+def extract_from_hp_search_log(log_path: Path) -> Tuple[Optional[List[dict]], Optional[int], Optional[dict]]:
     def _to_float(iterable): return list(map(float, iterable))
     with open(log_path, 'r') as f:
         log = f.read()
@@ -142,18 +142,22 @@ def extract_from_hp_search_log(log_path: Path) -> Tuple[List[dict], int, dict]:
         hp_match = re.findall(r'#+\s*\n\r?\s*(\{.*\})\s*\n\r?', exp, flags)
         if hp_match is not None and len(hp_match) > 0:
             epoch_matches = list(map(int, re.findall(r'Epoch\s+([0-9]+)/[0-9]+\s*\n\r?', exp, flags)))
-            train_matches = _to_float(re.findall(r'TRAIN_LOSS\s*=\s*([\.0-9]+)\n\r?', exp, flags))
-            valid_matches = _to_float(re.findall(r'VALID_LOSS\s*=\s*([\.0-9]+)\n\r?', exp, flags))
+            train_matches = _to_float(re.findall(r'TRAIN_(?:LOSS|MSE)\s*=\s*([\.0-9]+)\n\r?', exp, flags))
+            valid_matches = _to_float(re.findall(r'(?:VALID|TEST)_(?:LOSS|MSE)\s*=\s*([\.0-9]+)\n\r?', exp, flags))
 
-            if epoch_matches is not None and train_matches is not None and valid_matches is not None:
+            if epoch_matches and train_matches and valid_matches:
                 trials.append({'hyperparameters': hp_match[0], 'train_losses': _to_float(train_matches), 'valid_losses': _to_float(valid_matches),
                                'best_epoch': np.argmin(valid_matches), 'epochs': np.max(epoch_matches)})
             else:
                 print(f"WARNING: Can't parse resulting losses of hyperparameter search trial NO#{i}.")
         else:
             print(f"WARNING: Can't parse hyperparameter search trial NO#{i}.")
-    best_idx = np.argmin([np.min(t['valid_losses']) for t in trials])
-    return trials, best_idx, trials[best_idx]
+
+    if len(trials) == 0:
+        return [], None, None
+    else:
+        best_idx = np.argmin([np.min(t['valid_losses']) for t in trials])
+        return trials, best_idx, trials[best_idx]
 
 
 def summarize_hp_search(trials: List[dict], best_idx: int, hp_search_name: str = ''):
@@ -161,9 +165,9 @@ def summarize_hp_search(trials: List[dict], best_idx: int, hp_search_name: str =
     hp_search_name = hp_search_name.upper()
 
     valid_losses = list(map(op.itemgetter('valid_losses'), trials))
-    pd.DataFrame(valid_losses).T.plot(figsize=(20, 10), legend=False, logy=True, title=f'{hp_search_name} HYPERPARAMETER SEARCH - VALID LOSSES')
+    pd.DataFrame(valid_losses).T.plot(figsize=(18, 8), legend=False, logy=True, title=f'{hp_search_name} HYPERPARAMETER SEARCH - VALID LOSSES')
     train_losses = list(map(op.itemgetter('train_losses'), trials))
-    pd.DataFrame(train_losses).T.plot(figsize=(20, 10), legend=False, logy=True, title=f'{hp_search_name} HYPERPARAMETER SEARCH - TRAIN LOSSES')
+    pd.DataFrame(train_losses).T.plot(figsize=(18, 8), legend=False, logy=True, title=f'{hp_search_name} HYPERPARAMETER SEARCH - TRAIN LOSSES')
 
     best_epoch = best_trial['best_epoch']
     print('#' * 10 + f'  {hp_search_name} HYPERPARAMETER SEARCH RESULTS  ' + '#' * 10)
@@ -173,8 +177,8 @@ def summarize_hp_search(trials: List[dict], best_idx: int, hp_search_name: str =
     pp.pprint(best_trial['hyperparameters'])
 
     pd.DataFrame(best_trial).filter(('valid_losses', 'train_losses')) \
-        .plot(figsize=(20, 10), logy=True, title='BALL DETECTOR: BEST TRIAL LOSSES')
+        .plot(figsize=(18, 8), logy=True, title='BALL DETECTOR: BEST TRIAL LOSSES')
 
 
 if __name__ == '__main__':
-    extract_from_hp_search_log(source_dir() / r'../../hp_search_logs/hp_detect3.log')
+    extract_from_hp_search_log(source_dir() / r'../../hp_search_logs/hp_forecast3.log')
