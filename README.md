@@ -8,7 +8,7 @@ By Paul-Emmanuel Sotir
 ``` shell
 ############## Installation ##############
 
-git clone git@github.com:PaulEmmanuelSotir/BallDetectionAndForecasting.git
+git clone https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting.git
 conda env create -f ./environement.yml
 conda activate pytorch_5if
 # Downloads datasets ('curl' and 'tar' packages needed on a Linux distro (or WSL - Linux subsystem on Windows)):
