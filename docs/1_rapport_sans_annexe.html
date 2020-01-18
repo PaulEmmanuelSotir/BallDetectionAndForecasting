@@ -1,923 +1,299 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html><head>
+      <title>rapport</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:///c:\Users\paule\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.5.1\node_modules\@shd101wyy\mume\dependencies\katex\katex.min.css">
+      
+      
 
-<head>
-  <title>rapport</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      
+      
+      
+      
+      
+      
 
-  <link rel="stylesheet"
-    href="file:////home/pes/.vscode-server/extensions/shd101wyy.markdown-preview-enhanced-0.5.1/node_modules/@shd101wyy/mume/dependencies/katex/katex.min.css">
-
-
-
-
-
-
-
-
-
-
-
-  <style>
-    /**
+      <style>
+      /**
  * prism.js Github theme based on GitHub's theme.
  * @author Sam Clarke
  */
-    code[class*="language-"],
-    pre[class*="language-"] {
-      color: #333;
-      background: none;
-      font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-      text-align: left;
-      white-space: pre;
-      word-spacing: normal;
-      word-break: normal;
-      word-wrap: normal;
-      line-height: 1.4;
-
-      -moz-tab-size: 8;
-      -o-tab-size: 8;
-      tab-size: 8;
-
-      -webkit-hyphens: none;
-      -moz-hyphens: none;
-      -ms-hyphens: none;
-      hyphens: none;
-    }
-
-    /* Code blocks */
-    pre[class*="language-"] {
-      padding: .8em;
-      overflow: auto;
-      /* border: 1px solid #ddd; */
-      border-radius: 3px;
-      /* background: #fff; */
-      background: #f5f5f5;
-    }
-
-    /* Inline code */
-    :not(pre)>code[class*="language-"] {
-      padding: .1em;
-      border-radius: .3em;
-      white-space: normal;
-      background: #f5f5f5;
-    }
-
-    .token.comment,
-    .token.blockquote {
-      color: #969896;
-    }
-
-    .token.cdata {
-      color: #183691;
-    }
-
-    .token.doctype,
-    .token.punctuation,
-    .token.variable,
-    .token.macro.property {
-      color: #333;
-    }
-
-    .token.operator,
-    .token.important,
-    .token.keyword,
-    .token.rule,
-    .token.builtin {
-      color: #a71d5d;
-    }
-
-    .token.string,
-    .token.url,
-    .token.regex,
-    .token.attr-value {
-      color: #183691;
-    }
-
-    .token.property,
-    .token.number,
-    .token.boolean,
-    .token.entity,
-    .token.atrule,
-    .token.constant,
-    .token.symbol,
-    .token.command,
-    .token.code {
-      color: #0086b3;
-    }
-
-    .token.tag,
-    .token.selector,
-    .token.prolog {
-      color: #63a35c;
-    }
-
-    .token.function,
-    .token.namespace,
-    .token.pseudo-element,
-    .token.class,
-    .token.class-name,
-    .token.pseudo-class,
-    .token.id,
-    .token.url-reference .token.variable,
-    .token.attr-name {
-      color: #795da3;
-    }
-
-    .token.entity {
-      cursor: help;
-    }
-
-    .token.title,
-    .token.title .token.punctuation {
-      font-weight: bold;
-      color: #1d3e81;
-    }
-
-    .token.list {
-      color: #ed6a43;
-    }
-
-    .token.inserted {
-      background-color: #eaffea;
-      color: #55a532;
-    }
-
-    .token.deleted {
-      background-color: #ffecec;
-      color: #bd2c00;
-    }
-
-    .token.bold {
-      font-weight: bold;
-    }
-
-    .token.italic {
-      font-style: italic;
-    }
-
-
-    /* JSON */
-    .language-json .token.property {
-      color: #183691;
-    }
-
-    .language-markup .token.tag .token.punctuation {
-      color: #333;
-    }
-
-    /* CSS */
-    code.language-css,
-    .language-css .token.function {
-      color: #0086b3;
-    }
-
-    /* YAML */
-    .language-yaml .token.atrule {
-      color: #63a35c;
-    }
-
-    code.language-yaml {
-      color: #183691;
-    }
-
-    /* Ruby */
-    .language-ruby .token.function {
-      color: #333;
-    }
-
-    /* Markdown */
-    .language-markdown .token.url {
-      color: #795da3;
-    }
-
-    /* Makefile */
-    .language-makefile .token.symbol {
-      color: #795da3;
-    }
-
-    .language-makefile .token.variable {
-      color: #183691;
-    }
-
-    .language-makefile .token.builtin {
-      color: #0086b3;
-    }
-
-    /* Bash */
-    .language-bash .token.keyword {
-      color: #0086b3;
-    }
-
-    /* highlight */
-    pre[data-line] {
-      position: relative;
-      padding: 1em 0 1em 3em;
-    }
-
-    pre[data-line] .line-highlight-wrapper {
-      position: absolute;
-      top: 0;
-      left: 0;
-      background-color: transparent;
-      display: block;
-      width: 100%;
-    }
-
-    pre[data-line] .line-highlight {
-      position: absolute;
-      left: 0;
-      right: 0;
-      padding: inherit 0;
-      margin-top: 1em;
-      background: hsla(24, 20%, 50%, .08);
-      background: linear-gradient(to right, hsla(24, 20%, 50%, .1) 70%, hsla(24, 20%, 50%, 0));
-      pointer-events: none;
-      line-height: inherit;
-      white-space: pre;
-    }
-
-    pre[data-line] .line-highlight:before,
-    pre[data-line] .line-highlight[data-end]:after {
-      content: attr(data-start);
-      position: absolute;
-      top: .4em;
-      left: .6em;
-      min-width: 1em;
-      padding: 0 .5em;
-      background-color: hsla(24, 20%, 50%, .4);
-      color: hsl(24, 20%, 95%);
-      font: bold 65%/1.5 sans-serif;
-      text-align: center;
-      vertical-align: .3em;
-      border-radius: 999px;
-      text-shadow: none;
-      box-shadow: 0 1px white;
-    }
-
-    pre[data-line] .line-highlight[data-end]:after {
-      content: attr(data-end);
-      top: auto;
-      bottom: .4em;
-    }
-
-    html body {
-      font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      color: #333;
-      background-color: #fff;
-      overflow: initial;
-      box-sizing: border-box;
-      word-wrap: break-word
-    }
-
-    html body>:first-child {
-      margin-top: 0
-    }
-
-    html body h1,
-    html body h2,
-    html body h3,
-    html body h4,
-    html body h5,
-    html body h6 {
-      line-height: 1.2;
-      margin-top: 1em;
-      margin-bottom: 16px;
-      color: #000
-    }
-
-    html body h1 {
-      font-size: 2.25em;
-      font-weight: 300;
-      padding-bottom: .3em
-    }
-
-    html body h2 {
-      font-size: 1.75em;
-      font-weight: 400;
-      padding-bottom: .3em
-    }
-
-    html body h3 {
-      font-size: 1.5em;
-      font-weight: 500
-    }
-
-    html body h4 {
-      font-size: 1.25em;
-      font-weight: 600
-    }
-
-    html body h5 {
-      font-size: 1.1em;
-      font-weight: 600
-    }
-
-    html body h6 {
-      font-size: 1em;
-      font-weight: 600
-    }
-
-    html body h1,
-    html body h2,
-    html body h3,
-    html body h4,
-    html body h5 {
-      font-weight: 600
-    }
-
-    html body h5 {
-      font-size: 1em
-    }
-
-    html body h6 {
-      color: #5c5c5c
-    }
-
-    html body strong {
-      color: #000
-    }
-
-    html body del {
-      color: #5c5c5c
-    }
-
-    html body a:not([href]) {
-      color: inherit;
-      text-decoration: none
-    }
-
-    html body a {
-      color: #08c;
-      text-decoration: none
-    }
-
-    html body a:hover {
-      color: #00a3f5;
-      text-decoration: none
-    }
-
-    html body img {
-      max-width: 100%
-    }
-
-    html body>p {
-      margin-top: 0;
-      margin-bottom: 16px;
-      word-wrap: break-word
-    }
-
-    html body>ul,
-    html body>ol {
-      margin-bottom: 16px
-    }
-
-    html body ul,
-    html body ol {
-      padding-left: 2em
-    }
-
-    html body ul.no-list,
-    html body ol.no-list {
-      padding: 0;
-      list-style-type: none
-    }
-
-    html body ul ul,
-    html body ul ol,
-    html body ol ol,
-    html body ol ul {
-      margin-top: 0;
-      margin-bottom: 0
-    }
-
-    html body li {
-      margin-bottom: 0
-    }
-
-    html body li.task-list-item {
-      list-style: none
-    }
-
-    html body li>p {
-      margin-top: 0;
-      margin-bottom: 0
-    }
-
-    html body .task-list-item-checkbox {
-      margin: 0 .2em .25em -1.8em;
-      vertical-align: middle
-    }
-
-    html body .task-list-item-checkbox:hover {
-      cursor: pointer
-    }
-
-    html body blockquote {
-      margin: 16px 0;
-      font-size: inherit;
-      padding: 0 15px;
-      color: #5c5c5c;
-      border-left: 4px solid #d6d6d6
-    }
-
-    html body blockquote>:first-child {
-      margin-top: 0
-    }
-
-    html body blockquote>:last-child {
-      margin-bottom: 0
-    }
-
-    html body hr {
-      height: 4px;
-      margin: 32px 0;
-      background-color: #d6d6d6;
-      border: 0 none
-    }
-
-    html body table {
-      margin: 10px 0 15px 0;
-      border-collapse: collapse;
-      border-spacing: 0;
-      display: block;
-      width: 100%;
-      overflow: auto;
-      word-break: normal;
-      word-break: keep-all
-    }
-
-    html body table th {
-      font-weight: bold;
-      color: #000
-    }
-
-    html body table td,
-    html body table th {
-      border: 1px solid #d6d6d6;
-      padding: 6px 13px
-    }
-
-    html body dl {
-      padding: 0
-    }
-
-    html body dl dt {
-      padding: 0;
-      margin-top: 16px;
-      font-size: 1em;
-      font-style: italic;
-      font-weight: bold
-    }
-
-    html body dl dd {
-      padding: 0 16px;
-      margin-bottom: 16px
-    }
-
-    html body code {
-      font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
-      font-size: .85em !important;
-      color: #000;
-      background-color: #f0f0f0;
-      border-radius: 3px;
-      padding: .2em 0
-    }
-
-    html body code::before,
-    html body code::after {
-      letter-spacing: -0.2em;
-      content: "\00a0"
-    }
-
-    html body pre>code {
-      padding: 0;
-      margin: 0;
-      font-size: .85em !important;
-      word-break: normal;
-      white-space: pre;
-      background: transparent;
-      border: 0
-    }
-
-    html body .highlight {
-      margin-bottom: 16px
-    }
-
-    html body .highlight pre,
-    html body pre {
-      padding: 1em;
-      overflow: auto;
-      font-size: .85em !important;
-      line-height: 1.45;
-      border: #d6d6d6;
-      border-radius: 3px
-    }
-
-    html body .highlight pre {
-      margin-bottom: 0;
-      word-break: normal
-    }
-
-    html body pre code,
-    html body pre tt {
-      display: inline;
-      max-width: initial;
-      padding: 0;
-      margin: 0;
-      overflow: initial;
-      line-height: inherit;
-      word-wrap: normal;
-      background-color: transparent;
-      border: 0
-    }
-
-    html body pre code:before,
-    html body pre tt:before,
-    html body pre code:after,
-    html body pre tt:after {
-      content: normal
-    }
-
-    html body p,
-    html body blockquote,
-    html body ul,
-    html body ol,
-    html body dl,
-    html body pre {
-      margin-top: 0;
-      margin-bottom: 16px
-    }
-
-    html body kbd {
-      color: #000;
-      border: 1px solid #d6d6d6;
-      border-bottom: 2px solid #c7c7c7;
-      padding: 2px 4px;
-      background-color: #f0f0f0;
-      border-radius: 3px
-    }
-
-    @media print {
-      html body {
-        background-color: #fff
-      }
-
-      html body h1,
-      html body h2,
-      html body h3,
-      html body h4,
-      html body h5,
-      html body h6 {
-        color: #000;
-        page-break-after: avoid
-      }
-
-      html body blockquote {
-        color: #5c5c5c
-      }
-
-      html body pre {
-        page-break-inside: avoid
-      }
-
-      html body table {
-        display: table
-      }
-
-      html body img {
-        display: block;
-        max-width: 100%;
-        max-height: 100%
-      }
-
-      html body pre,
-      html body code {
-        word-wrap: break-word;
-        white-space: pre
-      }
-    }
-
-    .markdown-preview {
-      width: 100%;
-      height: 100%;
-      box-sizing: border-box
-    }
-
-    .markdown-preview .pagebreak,
-    .markdown-preview .newpage {
-      page-break-before: always
-    }
-
-    .markdown-preview pre.line-numbers {
-      position: relative;
-      padding-left: 3.8em;
-      counter-reset: linenumber
-    }
-
-    .markdown-preview pre.line-numbers>code {
-      position: relative
-    }
-
-    .markdown-preview pre.line-numbers .line-numbers-rows {
-      position: absolute;
-      pointer-events: none;
-      top: 1em;
-      font-size: 100%;
-      left: 0;
-      width: 3em;
-      letter-spacing: -1px;
-      border-right: 1px solid #999;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none
-    }
-
-    .markdown-preview pre.line-numbers .line-numbers-rows>span {
-      pointer-events: none;
-      display: block;
-      counter-increment: linenumber
-    }
-
-    .markdown-preview pre.line-numbers .line-numbers-rows>span:before {
-      content: counter(linenumber);
-      color: #999;
-      display: block;
-      padding-right: .8em;
-      text-align: right
-    }
-
-    .markdown-preview .mathjax-exps .MathJax_Display {
-      text-align: center !important
-    }
-
-    .markdown-preview:not([for="preview"]) .code-chunk .btn-group {
-      display: none
-    }
-
-    .markdown-preview:not([for="preview"]) .code-chunk .status {
-      display: none
-    }
-
-    .markdown-preview:not([for="preview"]) .code-chunk .output-div {
-      margin-bottom: 16px
-    }
-
-    .scrollbar-style::-webkit-scrollbar {
-      width: 8px
-    }
-
-    .scrollbar-style::-webkit-scrollbar-track {
-      border-radius: 10px;
-      background-color: transparent
-    }
-
-    .scrollbar-style::-webkit-scrollbar-thumb {
-      border-radius: 5px;
-      background-color: rgba(150, 150, 150, 0.66);
-      border: 4px solid rgba(150, 150, 150, 0.66);
-      background-clip: content-box
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode]) {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      margin: 0;
-      padding: 0;
-      overflow: auto
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
-      position: relative;
-      top: 0
-    }
-
-    @media screen and (min-width:914px) {
-      html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
-        padding: 2em calc(50% - 457px + 2em)
-      }
-    }
-
-    @media screen and (max-width:914px) {
-      html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
-        padding: 2em
-      }
-    }
-
-    @media screen and (max-width:450px) {
-      html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview {
-        font-size: 14px !important;
-        padding: 1em
-      }
-    }
-
-    @media print {
-      html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn {
-        display: none
-      }
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn {
-      position: fixed;
-      bottom: 8px;
-      left: 8px;
-      font-size: 28px;
-      cursor: pointer;
-      color: inherit;
-      z-index: 99;
-      width: 32px;
-      text-align: center;
-      opacity: .4
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn {
-      opacity: 1
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 300px;
-      height: 100%;
-      padding: 32px 0 48px 0;
-      font-size: 14px;
-      box-shadow: 0 0 4px rgba(150, 150, 150, 0.33);
-      box-sizing: border-box;
-      overflow: auto;
-      background-color: inherit
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar {
-      width: 8px
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track {
-      border-radius: 10px;
-      background-color: transparent
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb {
-      border-radius: 5px;
-      background-color: rgba(150, 150, 150, 0.66);
-      border: 4px solid rgba(150, 150, 150, 0.66);
-      background-clip: content-box
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a {
-      text-decoration: none
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul {
-      padding: 0 1.6em;
-      margin-top: .8em
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc li {
-      margin-bottom: .8em
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul {
-      list-style-type: none
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
-      left: 300px;
-      width: calc(100% - 300px);
-      padding: 2em calc(50% - 457px - 150px);
-      margin: 0;
-      box-sizing: border-box
-    }
-
-    @media screen and (max-width:1274px) {
-      html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
-        padding: 2em
-      }
-    }
-
-    @media screen and (max-width:450px) {
-      html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview {
-        width: 100%
-      }
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview {
-      left: 50%;
-      transform: translateX(-50%)
-    }
-
-    html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc {
-      display: none
-    }
-
-    /* Please visit the URL below for more information: */
-    /*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
-  </style>
-</head>
-
-<body for="html-export">
-  <div class="mume markdown-preview  ">
-    <h1 class="mume-header" id="rapport-tp-deep-learning-insa-lyon-5if">&#x1F98F;&#x1F393; RAPPORT TP DEEP LEARNING -
-      INSA Lyon 5IF &#x1F393;&#x1F98F;</h1>
-
-    <h6 class="mume-header" id="_paul-emmanuel-sotir-paul-emmanuelsotirinsa-lyonfr-paul-emmanueloutlookcom_">
-      <em>Paul-Emmanuel SOTIR &lt;<a
-          href="mailto:paul-emmanuel.sotir@insa-lyon.fr">paul-emmanuel.sotir@insa-lyon.fr</a>&gt; ; &lt;<a
-          href="mailto:paul-emmanuel@outlook.com">paul-emmanuel@outlook.com</a>&gt;</em></h6>
-
-    <ul>
-      <li>Course link <a
-          href="https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html">https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html</a>
-      </li>
-      <li>Github repository: <a
-          href="https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting">https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting</a>
-      </li>
-    </ul>
-    <h3 class="mume-header" id="introduction">Introduction</h3>
-
-    <p>L&apos;objectif de ce projet est d&apos;acquerir des connaissances autour de l&apos;aspect empirique du deep
-      learning. Ce projet est l&apos;occasion de mieux maitriser le framework pytorch dans un cas d&apos;utilisation
-      simple mais relativement complet.<br>
-      Ce TP se divise en deux taches: impl&#xE9;menter un mod&#xE8;le &#xE0; base de r&#xE9;seaux neuronaux pour la
-      detection de balles color&#xE9;es dans des images et un mod&#xE8;le de pr&#xE9;diction de la position future de
-      balles.</p>
-    <p>Le dataset utilis&#xE9; dans ce projet est un sous-ensemble du dataset synth&#xE9;tique cr&#xE9;e pour les
-      experimentations d&#xE9;crites dans le papier suivant : <a href="https://arxiv.org/abs/1909.12000"><em>Fabien
-          Baradel, Natalia Neverova, Julien Mille, Greg Mori, Christian Wolf. COPHY: Counterfactual Learning of Physical
-          Dynamics. pre-print arXiv:1909.12000, 2019.</em></a>.<br>
-      Une des particularit&#xE9;s de ce dataset que l&apos;on a observ&#xE9;s lors de l&apos;exploration des
-      donn&#xE9;es est que toutes les images (100x100) ne comprenent que trois balles et chaques balles d&apos;une
-      m&#xEA;me image ont une couleur diff&#xE9;rente parmis les 9 couleurs possibles.<br>
-      J&apos;ai &#xE9;galement p&#xFB; observer une certaine redondance d&apos;information de par la repr&#xE9;sentation
-      des donn&#xE9;es utilis&#xE9;e: les bounding boxes des balles indiquent la couleur, de par leur position dans le
-      tenseur, alors que les informations de couleurs sont d&#xE9;j&#xE0; pr&#xE9;sentes dans le vecteur de couleurs. Un
-      des points important de ce TP est que le dataset est pens&#xE9; pour &#xE9;viter certaines difficult&#xE9;es
-      communes &#xE0; la detection d&apos;objet: avec un nombre constant de balles &#xE0; detecter, les mod&#xE8;les
-      &#xE0; impl&#xE9;menter sont bien plus simples (pas d&apos;approches r&#xE9;curantes (RCNN) ou similaires aux
-      mod&#xE8;les de detection tels que SSD ou Yolo). De m&#xEA;me, il est peut-&#xEA;tre possible que la redondance
-      des informations est la cons&#xE9;quence d&apos;une d&#xE9;marche visant &#xE0; rendre l&apos;entrainement plus
-      simple sur les bounding boxes en donnant une s&#xE9;mantique claire et simple de l&apos;emplacement et
-      l&apos;ordre des boundings boxes &#xE0; inferer (ordre/emplacement donn&#xE9; par la couleur). Ainsi, il n&apos;y
-      a pas besoin de penser une &apos;<em>loss</em>&apos; ou un post-traitement sp&#xE9;cifique qui renderais le
-      mod&#xE8;le invariant &#xE0; l&apos;ordre des bounding boxes (autrement, le mod&#xE8;le aurait plus de mal &#xE0;
-      converger puisque m&#xEA;me si il inf&#xE8;re des bounding boxes parfaites, si elles sont donn&#xE9;es dans le
-      &apos;mauvais ordre&apos;, alors l&apos;erreur sera importante).</p>
-    <p>Pour une meilleure reproductibilit&#xE9; des r&#xE9;sultats, nous avons fix&#xE9; les seeds al&#xE9;atoires de
-      <code>numpy.random</code>, <code>python.random</code>, de <code>torch.manual_seed</code> ainsi que
-      <code>torch.cuda.manual_seed_all</code>.</p>
-    <p>Les donn&#xE9;es fournies pour ce TP sont divis&#xE9;es en deux sous datasets associ&#xE9;s aux deux
-      t&#xE2;ches/parties de ce TP :</p>
-    <h4 class="mume-header" id="tache-1-detection-de-balles">Tache 1 : detection de balles</h4>
-
-    <p>Le but de cette premi&#xE8;re t&#xE2;che est dans un premier temps d&apos;impl&#xE9;menter un mod&#xE8;le la
-      couleur des balles d&apos;un image en entr&#xE9;e. Puis dans un second temps, d&apos;ajouter au mod&#xE8;le
-      entrain&#xE9;, l&apos;inf&#xE9;rence des coordon&#xE9;es des bounding boxes donnant la position des balles dans
-      l&apos;image en entr&#xE9;e.</p>
-    <h4 class="mume-header" id="tache-2-pr%C3%A9diction-de-la-position-future-de-balles">Tache 2 : pr&#xE9;diction de la
-      position future de balles</h4>
-
-    <p>La seconde partie de ce TP vise &#xE0; impl&#xE9;menter un mod&#xE8;le pouvant pr&#xE9;dire la position future de
-      3 balles &#xE0; partir d&apos;une s&#xE9;quence de 19 observations dans le temps de la position des balles dans
-      les images (pr&#xE9;diction de la 20&#xE8;me observation des balles). Ce mod&#xE8;le ne prend pas nescessairement
-      d&apos;image en entr&#xE9;e, seulement la s&#xE9;quence pass&#xE9;e de positions de balles et le vecteur de
-      couleurs d&apos;images suffisent (on suppose que l&apos;image ne contient pas d&apos;informations
-      suppl&#xE9;mentaires sur le mouvement des balles).</p>
-    <p>Entrainer un mod&#xE8;le sur cette seconde t&#xE2;che am&#xE8;ne le mod&#xE8;le &#xE0; inf&#xE8;rer partiellement
-      et implicitement les proprit&#xE9;t&#xE9;s physiques de la balles. En effet le dataset synth&#xE9;tique a
-      &#xE9;t&#xE9; g&#xE9;n&#xE9;r&#xE9; en simulant le mouvement de balles avec des propri&#xE9;t&#xE9; physiques
-      variables (masses, frottements, ect...) et ces param&#xE8;tres ne sont nullement disponnibles au del&#xE0; de
-      l&apos;observation du comportement de la balle. Ce dataset est pens&#xE9; pour que le probl&#xE8;me pos&#xE9; ne
-      soit pas totalement r&#xE9;solvable (&apos;<em>ill posed problem</em>&apos;) puisque les prori&#xE9;t&#xE9;s
-      physiques des balles ne peuvent pas &#xEA;tre completement connues &#xE0; partir de la s&#xE9;quence seule.</p>
-    <p>On peut aussi se poser la question, concerant le vecteur de couleurs des balles, de si les propri&#xE9;t&#xE9;s
-      physiques des balles sont elles partielement correll&#xE9;es avec leur couleurs respective. Si on prend pour
-      &#xE0;-priori qu&apos;il n&apos;y a pas de causalit&#xE9; alors on peut ignorer totalement les couleurs pour cette
-      partie du TP.<br>
-      Nous faisons le choix de prendre le vecteur des couleurs en entr&#xE9;e de notre mod&#xE8;le. A suposer qu&apos;il
-      n&apos;y a pas d&apos;information pertinantes sur les mouvements de balles dans leur couleurs, il faut
-      esp&#xE8;rer que le dataset ne pr&#xE9;sente pas de correlations sans causalit&#xE9; (nous n&apos;avons pas
-      explor&#xE9; cet aspect dans l&apos;EDA) et que la r&#xE9;gularisation du mod&#xE8;le suffirat &#xE0; surmonter
-      les l&#xE9;g&#xE8;res corr&#xE9;lation.</p>
-    <h3 class="mume-header" id="run-instructions">Run instructions</h3>
-
-    <p>Les d&#xE9;pendences du projets sont g&#xE8;r&#xE9;es avec un environement conda; Il suffit donc d&apos;une
-      distribution conda (e.g. Anconda ou Miniconda) et de cr&#xE9;er l&apos;environement conda pour pouvoir executer le
-      code. Les fichiers python <strong><code>../src/train.py</code></strong> (entrainement d&apos;un mod&#xE8;le avec
-      les meilleurs hyperparam&#xE8;tres trouv&#xE9;s) et <strong><code>../src/hp.py</code></strong> (recherche
-      d&apos;hyperparametres executant de nombreux entrainement sur moins d&apos;epochs) sont les deux points
-      d&apos;entr&#xE9;e principals. Ces deux programmes doivent avoir pour argument <strong><code>--model
-          detect</code></strong> (t&#xE2;che 1: detection de balles) ou <strong><code>--model forecast</code></strong>
-      (t&#xE2;che 2: pr&#xE9;diction de position de balle future).</p>
-    <p>Ci dessous les instructions d&apos;installation et des exemples d&apos;execution d&apos;entrainements et de
-      recherches d&apos;hyperparametres sur les t&#xE2;ches 1 et 2 :</p>
-    <pre data-role="codeBlock" data-info="shell" class="language-shell"><span class="token comment">############## Installation ##############</span>
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #333;
+  background: none;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.4;
+
+  -moz-tab-size: 8;
+  -o-tab-size: 8;
+  tab-size: 8;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: .8em;
+  overflow: auto;
+  /* border: 1px solid #ddd; */
+  border-radius: 3px;
+  /* background: #fff; */
+  background: #f5f5f5;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+  white-space: normal;
+  background: #f5f5f5;
+}
+
+.token.comment,
+.token.blockquote {
+  color: #969896;
+}
+
+.token.cdata {
+  color: #183691;
+}
+
+.token.doctype,
+.token.punctuation,
+.token.variable,
+.token.macro.property {
+  color: #333;
+}
+
+.token.operator,
+.token.important,
+.token.keyword,
+.token.rule,
+.token.builtin {
+  color: #a71d5d;
+}
+
+.token.string,
+.token.url,
+.token.regex,
+.token.attr-value {
+  color: #183691;
+}
+
+.token.property,
+.token.number,
+.token.boolean,
+.token.entity,
+.token.atrule,
+.token.constant,
+.token.symbol,
+.token.command,
+.token.code {
+  color: #0086b3;
+}
+
+.token.tag,
+.token.selector,
+.token.prolog {
+  color: #63a35c;
+}
+
+.token.function,
+.token.namespace,
+.token.pseudo-element,
+.token.class,
+.token.class-name,
+.token.pseudo-class,
+.token.id,
+.token.url-reference .token.variable,
+.token.attr-name {
+  color: #795da3;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.token.title,
+.token.title .token.punctuation {
+  font-weight: bold;
+  color: #1d3e81;
+}
+
+.token.list {
+  color: #ed6a43;
+}
+
+.token.inserted {
+  background-color: #eaffea;
+  color: #55a532;
+}
+
+.token.deleted {
+  background-color: #ffecec;
+  color: #bd2c00;
+}
+
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+
+/* JSON */
+.language-json .token.property {
+  color: #183691;
+}
+
+.language-markup .token.tag .token.punctuation {
+  color: #333;
+}
+
+/* CSS */
+code.language-css,
+.language-css .token.function {
+  color: #0086b3;
+}
+
+/* YAML */
+.language-yaml .token.atrule {
+  color: #63a35c;
+}
+
+code.language-yaml {
+  color: #183691;
+}
+
+/* Ruby */
+.language-ruby .token.function {
+  color: #333;
+}
+
+/* Markdown */
+.language-markdown .token.url {
+  color: #795da3;
+}
+
+/* Makefile */
+.language-makefile .token.symbol {
+  color: #795da3;
+}
+
+.language-makefile .token.variable {
+  color: #183691;
+}
+
+.language-makefile .token.builtin {
+  color: #0086b3;
+}
+
+/* Bash */
+.language-bash .token.keyword {
+  color: #0086b3;
+}
+
+/* highlight */
+pre[data-line] {
+  position: relative;
+  padding: 1em 0 1em 3em;
+}
+pre[data-line] .line-highlight-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+  display: block;
+  width: 100%;
+}
+
+pre[data-line] .line-highlight {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: inherit 0;
+  margin-top: 1em;
+  background: hsla(24, 20%, 50%,.08);
+  background: linear-gradient(to right, hsla(24, 20%, 50%,.1) 70%, hsla(24, 20%, 50%,0));
+  pointer-events: none;
+  line-height: inherit;
+  white-space: pre;
+}
+
+pre[data-line] .line-highlight:before, 
+pre[data-line] .line-highlight[data-end]:after {
+  content: attr(data-start);
+  position: absolute;
+  top: .4em;
+  left: .6em;
+  min-width: 1em;
+  padding: 0 .5em;
+  background-color: hsla(24, 20%, 50%,.4);
+  color: hsl(24, 20%, 95%);
+  font: bold 65%/1.5 sans-serif;
+  text-align: center;
+  vertical-align: .3em;
+  border-radius: 999px;
+  text-shadow: none;
+  box-shadow: 0 1px white;
+}
+
+pre[data-line] .line-highlight[data-end]:after {
+  content: attr(data-end);
+  top: auto;
+  bottom: .4em;
+}html body{font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ul,html body>ol{margin-bottom:16px}html body ul,html body ol{padding-left:2em}html body ul.no-list,html body ol.no-list{padding:0;list-style-type:none}html body ul ul,html body ul ol,html body ol ol,html body ol ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:bold;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:bold}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em !important;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::before,html body code::after{letter-spacing:-0.2em;content:"\00a0"}html body pre>code{padding:0;margin:0;font-size:.85em !important;word-break:normal;white-space:pre;background:transparent;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;font-size:.85em !important;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:before,html body pre tt:before,html body pre code:after,html body pre tt:after{content:normal}html body p,html body blockquote,html body ul,html body ol,html body dl,html body pre{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body pre,html body code{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview .pagebreak,.markdown-preview .newpage{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center !important}.markdown-preview:not([for="preview"]) .code-chunk .btn-group{display:none}.markdown-preview:not([for="preview"]) .code-chunk .status{display:none}.markdown-preview:not([for="preview"]) .code-chunk .output-div{margin-bottom:16px}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0}@media screen and (min-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{font-size:14px !important;padding:1em}}@media print{html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,0.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{padding:0 1.6em;margin-top:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc li{margin-bottom:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{list-style-type:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% -  300px);padding:2em calc(50% - 457px -  150px);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+    </head>
+    <body for="html-export">
+      <div class="mume markdown-preview  ">
+      <h1 class="mume-header" id="rapport-tp-deep-learning-insa-lyon-5if">&#x1F98F;&#x1F393; RAPPORT TP DEEP LEARNING - INSA Lyon 5IF &#x1F393;&#x1F98F;</h1>
+
+<h6 class="mume-header" id="_paul-emmanuel-sotir-paul-emmanuelsotirinsa-lyonfr-paul-emmanueloutlookcom_"><em>Paul-Emmanuel SOTIR &lt;<a href="mailto:paul-emmanuel.sotir@insa-lyon.fr">paul-emmanuel.sotir@insa-lyon.fr</a>&gt; ; &lt;<a href="mailto:paul-emmanuel@outlook.com">paul-emmanuel@outlook.com</a>&gt;</em></h6>
+
+<ul>
+<li>Course link <a href="https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html">https://perso.liris.cnrs.fr/christian.wolf/teaching/deeplearning/tp.html</a></li>
+<li>Github repository: <a href="https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting">https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting</a></li>
+</ul>
+<h3 class="mume-header" id="introduction">Introduction</h3>
+
+<p>L&apos;objectif de ce projet est d&apos;acquerir des connaissances autour de l&apos;aspect empirique du deep learning. Ce projet est l&apos;occasion de mieux maitriser le framework pytorch dans un cas d&apos;utilisation simple mais relativement complet.<br>
+Ce TP se divise en deux taches: impl&#xE9;menter un mod&#xE8;le &#xE0; base de r&#xE9;seaux neuronaux pour la detection de balles color&#xE9;es dans des images et un mod&#xE8;le de pr&#xE9;diction de la position future de balles.</p>
+<p>Le dataset utilis&#xE9; dans ce projet est un sous-ensemble du dataset synth&#xE9;tique cr&#xE9;e pour les experimentations d&#xE9;crites dans le papier suivant : <a href="https://arxiv.org/abs/1909.12000"><em>Fabien Baradel, Natalia Neverova, Julien Mille, Greg Mori, Christian Wolf. COPHY: Counterfactual Learning of Physical Dynamics. pre-print arXiv:1909.12000, 2019.</em></a>.<br>
+Une des particularit&#xE9;s de ce dataset que l&apos;on a observ&#xE9;s lors de l&apos;exploration des donn&#xE9;es est que toutes les images (100x100) ne comprenent que trois balles et chaques balles d&apos;une m&#xEA;me image ont une couleur diff&#xE9;rente parmis les 9 couleurs possibles.<br>
+J&apos;ai &#xE9;galement p&#xFB; observer une certaine redondance d&apos;information de par la repr&#xE9;sentation des donn&#xE9;es utilis&#xE9;e: les bounding boxes des balles indiquent la couleur, de par leur position dans le tenseur, alors que les informations de couleurs sont d&#xE9;j&#xE0; pr&#xE9;sentes dans le vecteur de couleurs. Un des points important de ce TP est que le dataset est pens&#xE9; pour &#xE9;viter certaines difficult&#xE9;es communes &#xE0; la detection d&apos;objet: avec un nombre constant de balles &#xE0; detecter, les mod&#xE8;les &#xE0; impl&#xE9;menter sont bien plus simples (pas d&apos;approches r&#xE9;curantes (RCNN) ou similaires aux mod&#xE8;les de detection tels que SSD ou Yolo). De m&#xEA;me, il est peut-&#xEA;tre possible que la redondance des informations est la cons&#xE9;quence d&apos;une d&#xE9;marche visant &#xE0; rendre l&apos;entrainement plus simple sur les bounding boxes en donnant une s&#xE9;mantique claire et simple de l&apos;emplacement et l&apos;ordre des boundings boxes &#xE0; inferer (ordre/emplacement donn&#xE9; par la couleur). Ainsi, il n&apos;y a pas besoin de penser une &apos;<em>loss</em>&apos; ou un post-traitement sp&#xE9;cifique qui renderais le mod&#xE8;le invariant &#xE0; l&apos;ordre des bounding boxes (autrement, le mod&#xE8;le aurait plus de mal &#xE0; converger puisque m&#xEA;me si il inf&#xE8;re des bounding boxes parfaites, si elles sont donn&#xE9;es dans le &apos;mauvais ordre&apos;, alors l&apos;erreur sera importante).</p>
+<p>Pour une meilleure reproductibilit&#xE9; des r&#xE9;sultats, nous avons fix&#xE9; les seeds al&#xE9;atoires de <code>numpy.random</code>, <code>python.random</code>, de <code>torch.manual_seed</code> ainsi que <code>torch.cuda.manual_seed_all</code>.</p>
+<p>Les donn&#xE9;es fournies pour ce TP sont divis&#xE9;es en deux sous datasets associ&#xE9;s aux deux t&#xE2;ches/parties de ce TP :</p>
+<h4 class="mume-header" id="tache-1-detection-de-balles">Tache 1 : detection de balles</h4>
+
+<p>Le but de cette premi&#xE8;re t&#xE2;che est dans un premier temps d&apos;impl&#xE9;menter un mod&#xE8;le la couleur des balles d&apos;un image en entr&#xE9;e. Puis dans un second temps, d&apos;ajouter au mod&#xE8;le entrain&#xE9;, l&apos;inf&#xE9;rence des coordon&#xE9;es des bounding boxes donnant la position des balles dans l&apos;image en entr&#xE9;e.</p>
+<h4 class="mume-header" id="tache-2-pr%C3%A9diction-de-la-position-future-de-balles">Tache 2 : pr&#xE9;diction de la position future de balles</h4>
+
+<p>La seconde partie de ce TP vise &#xE0; impl&#xE9;menter un mod&#xE8;le pouvant pr&#xE9;dire la position future de 3 balles &#xE0; partir d&apos;une s&#xE9;quence de 19 observations dans le temps de la position des balles dans les images (pr&#xE9;diction de la 20&#xE8;me observation des balles). Ce mod&#xE8;le ne prend pas nescessairement d&apos;image en entr&#xE9;e, seulement la s&#xE9;quence pass&#xE9;e de positions de balles et le vecteur de couleurs d&apos;images suffisent (on suppose que l&apos;image ne contient pas d&apos;informations suppl&#xE9;mentaires sur le mouvement des balles).</p>
+<p>Entrainer un mod&#xE8;le sur cette seconde t&#xE2;che am&#xE8;ne le mod&#xE8;le &#xE0; inf&#xE8;rer partiellement et implicitement les proprit&#xE9;t&#xE9;s physiques de la balles. En effet le dataset synth&#xE9;tique a &#xE9;t&#xE9; g&#xE9;n&#xE9;r&#xE9; en simulant le mouvement de balles avec des propri&#xE9;t&#xE9; physiques variables (masses, frottements, ect...) et ces param&#xE8;tres ne sont nullement disponnibles au del&#xE0; de l&apos;observation du comportement de la balle. Ce dataset est pens&#xE9; pour que le probl&#xE8;me pos&#xE9; ne soit pas totalement r&#xE9;solvable (&apos;<em>ill posed problem</em>&apos;) puisque les prori&#xE9;t&#xE9;s physiques des balles ne peuvent pas &#xEA;tre completement connues &#xE0; partir de la s&#xE9;quence seule.</p>
+<p>On peut aussi se poser la question, concerant le vecteur de couleurs des balles, de si les propri&#xE9;t&#xE9;s physiques des balles sont elles partielement correll&#xE9;es avec leur couleurs respective. Si on prend pour &#xE0;-priori qu&apos;il n&apos;y a pas de causalit&#xE9; alors on peut ignorer totalement les couleurs pour cette partie du TP.<br>
+Nous faisons le choix de prendre le vecteur des couleurs en entr&#xE9;e de notre mod&#xE8;le. A suposer qu&apos;il n&apos;y a pas d&apos;information pertinantes sur les mouvements de balles dans leur couleurs, il faut esp&#xE8;rer que le dataset ne pr&#xE9;sente pas de correlations sans causalit&#xE9; (nous n&apos;avons pas explor&#xE9; cet aspect dans l&apos;EDA) et que la r&#xE9;gularisation du mod&#xE8;le suffirat &#xE0; surmonter les l&#xE9;g&#xE8;res corr&#xE9;lation.</p>
+<h3 class="mume-header" id="run-instructions">Run instructions</h3>
+
+<p>Les d&#xE9;pendences du projets sont g&#xE8;r&#xE9;es avec un environement conda; Il suffit donc d&apos;une distribution conda (e.g. Anconda ou Miniconda) et de cr&#xE9;er l&apos;environement conda pour pouvoir executer le code. Les fichiers python <strong><code>../src/train.py</code></strong> (entrainement d&apos;un mod&#xE8;le avec les meilleurs hyperparam&#xE8;tres trouv&#xE9;s) et <strong><code>../src/hp.py</code></strong> (recherche d&apos;hyperparametres executant de nombreux entrainement sur moins d&apos;epochs) sont les deux points d&apos;entr&#xE9;e principals. Ces deux programmes doivent avoir pour argument <strong><code>--model detect</code></strong> (t&#xE2;che 1: detection de balles) ou <strong><code>--model forecast</code></strong> (t&#xE2;che 2: pr&#xE9;diction de position de balle future).</p>
+<p>Ci dessous les instructions d&apos;installation et des exemples d&apos;execution d&apos;entrainements et de recherches d&apos;hyperparametres sur les t&#xE2;ches 1 et 2 :</p>
+<pre data-role="codeBlock" data-info="shell" class="language-shell"><span class="token comment">############## Installation ##############</span>
 
 <span class="token function">git</span> clone git@github.com:PaulEmmanuelSotir/BallDetectionAndForecasting.git
 conda <span class="token function">env</span> create -f ./environement.yml
@@ -935,9 +311,8 @@ python -O ./src/hp.py --model detect <span class="token operator">|</span> <span
 python -O ./src/train.py --model forecast
 <span class="token comment"># Execute une recherche d&apos;hyperparam&#xE8;tres pour la pr&#xE9;diction de position de la balles (hyperopt)</span>
 python -O ./src/hp.py --model forecast <span class="token operator">|</span> <span class="token function">tee</span> ./hp_forecast.log
-</pre>
-    <p>Example d&apos;entrainement du mod&#xE8;le de detection de balles :</p>
-    <pre data-role="codeBlock" data-info="shell" class="language-shell"><span class="token punctuation">(</span>pytorch_5if<span class="token punctuation">)</span> pes@pes-desktop:~/BallDetectionAndForecasting$ python -O ./src/train.py --model detect
+</pre><p>Example d&apos;entrainement du mod&#xE8;le de detection de balles :</p>
+<pre data-role="codeBlock" data-info="shell" class="language-shell"><span class="token punctuation">(</span>pytorch_5if<span class="token punctuation">)</span> pes@pes-desktop:~/BallDetectionAndForecasting$ python -O ./src/train.py --model detect
 <span class="token operator">&gt;</span> Initializing and training ball detection model <span class="token punctuation">(</span>mini_balls dataset<span class="token punctuation">)</span><span class="token punctuation">..</span>.
 <span class="token operator">&gt;</span> __debug__ <span class="token operator">==</span> False - Using 16 workers <span class="token keyword">in</span> each DataLoader<span class="token punctuation">..</span>.
 <span class="token operator">&gt;</span> MODEL ARCHITECTURE:
@@ -1015,37 +390,21 @@ Epoch 002/400
 <span class="token punctuation">..</span>.
 <span class="token punctuation">..</span>.
 <span class="token punctuation">..</span>.
-</pre>
-    <p>Une fois les recherches d&apos;hyperparam&#xE8;tres lanc&#xE9;es ou termin&#xE9;es, on peut utiliser les fonction
-      outils <strong><code>balldetect.torch_utils.extract_from_hp_search_log()</code></strong> et
-      <strong><code>balldetect.torch_utils.summarize_hp_search()</code></strong> pour explorer les r&#xE9;sultats
-      d&apos;une recherche d&apos;hyperparam&#xE8;tres sur un notebook jupyter, par example (voir le notebook
-      <code>../notebooks/ball_detection_hp_search_results.ipynb</code>, les logs bruts situ&#xE9; dans le dossier <a
-        href="../hp_search_logs/">../hp_search_logs/</a>, l&apos;annexe &#xE0; la fin de ce rapport pour les
-      r&#xE9;sultats des recherches d&apos;hyperparam&#xE8;tres ou <code>../src/hp.py</code> pour
-      l&apos;impl&#xE9;mentation de la recherche d&apos;hyperparam&#xE8;tres avec le module
-      &apos;<strong>hyperopt</strong>&apos;).</p>
-    <h3 class="mume-header" id="developement-et-documentation">Developement et documentation</h3>
+</pre><p>Une fois les recherches d&apos;hyperparam&#xE8;tres lanc&#xE9;es ou termin&#xE9;es, on peut utiliser les fonction outils <strong><code>balldetect.torch_utils.extract_from_hp_search_log()</code></strong> et <strong><code>balldetect.torch_utils.summarize_hp_search()</code></strong> pour explorer les r&#xE9;sultats d&apos;une recherche d&apos;hyperparam&#xE8;tres sur un notebook jupyter, par example (voir le notebook <code>../notebooks/hp_search_results.ipynb</code>, les logs bruts situ&#xE9; dans le dossier <a href="../hp_search_logs/">../hp_search_logs/</a>, l&apos;annexe &#xE0; la fin de ce rapport pour les r&#xE9;sultats des recherches d&apos;hyperparam&#xE8;tres ou <code>../src/hp.py</code> pour l&apos;impl&#xE9;mentation de la recherche d&apos;hyperparam&#xE8;tres avec le module &apos;<strong>hyperopt</strong>&apos;).</p>
+<h3 class="mume-header" id="developement-et-documentation">Developement et documentation</h3>
 
-    <h4 class="mume-header" id="architecture-du-projet">Architecture du projet</h4>
+<h4 class="mume-header" id="architecture-du-projet">Architecture du projet</h4>
 
-    <p>Le projet est constitu&#xE9; d&apos;un module Python &apos;balldetect&apos; contenant :</p>
-    <ul>
-      <li>L&apos;impl&#xE9;mentation (d&#xE9;finition, entrainement, &#xE9;valuation) des deux mod&#xE8;les
-        r&#xE9;solvant les t&#xE2;ches 1 et 2 (../src/balldetect/ball_detector.py et
-        ../src/balldetect/seq_prediction.py)</li>
-      <li>Le code pour charger/pr&#xE9;traiter les datasets (../src/balldetect/datasets.py)</li>
-      <li>torch_utils.py contenant diverses fonction r&#xE9;utilisables, notamment pour la d&#xE9;finition et
-        entrainement d&apos;un mod&#xE8;le pytorch</li>
-      <li>Et &#xE9;galement un fichier fournit facilitant la visualisation des images avec ou sans bounding boxes
-        (../src/balldetect/vis.py)</li>
-    </ul>
-    <p>Les fichiers ../src/train.py et ../src/hp.py sont les points d&apos;entr&#xE9;e pour, respectivement,
-      l&apos;entrainement d&apos;un mod&#xE8;le (detection ou forecasting) avec les meilleurs param&#xE8;tres
-      trouv&#xE9;s et la recherche d&apos;hyperparam&#xE8;tres (detction ou forecasting) cherchant les meilleurs
-      hyperparam&#xE8;tres &apos;sampled&apos; dans un espace d&#xE9;finit.</p>
-    <p>Organisation du dossier du projet :</p>
-    <pre data-role="codeBlock" data-info="python" class="language-python"><span class="token operator">-</span> BallDetectionAndForecasting
+<p>Le projet est constitu&#xE9; d&apos;un module Python &apos;balldetect&apos; contenant :</p>
+<ul>
+<li>L&apos;impl&#xE9;mentation (d&#xE9;finition, entrainement, &#xE9;valuation) des deux mod&#xE8;les r&#xE9;solvant les t&#xE2;ches 1 et 2 (../src/balldetect/ball_detector.py et ../src/balldetect/seq_prediction.py)</li>
+<li>Le code pour charger/pr&#xE9;traiter les datasets (../src/balldetect/datasets.py)</li>
+<li>torch_utils.py contenant diverses fonction r&#xE9;utilisables, notamment pour la d&#xE9;finition et entrainement d&apos;un mod&#xE8;le pytorch</li>
+<li>Et &#xE9;galement un fichier fournit facilitant la visualisation des images avec ou sans bounding boxes (../src/balldetect/vis.py)</li>
+</ul>
+<p>Les fichiers ../src/train.py et ../src/hp.py sont les points d&apos;entr&#xE9;e pour, respectivement, l&apos;entrainement d&apos;un mod&#xE8;le (detection ou forecasting) avec les meilleurs param&#xE8;tres trouv&#xE9;s et la recherche d&apos;hyperparam&#xE8;tres (detction ou forecasting) cherchant les meilleurs hyperparam&#xE8;tres &apos;sampled&apos; dans un espace d&#xE9;finit.</p>
+<p>Organisation du dossier du projet :</p>
+<pre data-role="codeBlock" data-info="python" class="language-python"><span class="token operator">-</span> BallDetectionAndForecasting
   <span class="token operator">-</span> src<span class="token operator">/</span>                        <span class="token comment"># Code source du projet</span>
     <span class="token operator">-</span> balldetect<span class="token operator">/</span>               <span class="token comment"># Module &apos;balldetect&apos;</span>
       <span class="token operator">-</span> __init__<span class="token punctuation">.</span>py
@@ -1057,207 +416,87 @@ Epoch 002/400
     <span class="token operator">-</span> train<span class="token punctuation">.</span>py                  <span class="token comment"># Code utilisant le module &apos;balldetect&apos; pour entrainer le mod&#xE8;le de detection ou de pr&#xE9;diction de position de balles</span>
     <span class="token operator">-</span> hp<span class="token punctuation">.</span>py                     <span class="token comment"># Code de recherche d&apos;hyperparam&#xE8;tres</span>
   <span class="token operator">-</span> notebooks<span class="token operator">/</span>
-    <span class="token operator">-</span> ball_detection_hp_search_results<span class="token punctuation">.</span>ipynb  <span class="token comment"># Notebook inspectant le r&#xE9;sultat des recherches d&apos;hyperparam&#xE8;tres</span>
+    <span class="token operator">-</span> hp_search_results<span class="token punctuation">.</span>ipynb  <span class="token comment"># Notebook inspectant le r&#xE9;sultat des recherches d&apos;hyperparam&#xE8;tres</span>
     <span class="token operator">-</span> test_fastai<span class="token punctuation">.</span>ipynb         <span class="token comment"># Notebook &apos;brouillon&apos; testant une approche pr&#xE9;liminaire au TP avec fastai (tache 1.1)</span>
     <span class="token operator">-</span> test_fastai<span class="token operator">-</span>bbox<span class="token punctuation">.</span>ipynb    <span class="token comment"># Notebook &apos;brouillon&apos;testant une approche pr&#xE9;liminaire au TP avec fastai (tache 1.2: version avec bounding-boxes)</span>
   <span class="token operator">-</span> datasets<span class="token operator">/</span>
     <span class="token operator">-</span> mini_balls<span class="token operator">/</span>
     <span class="token operator">-</span> mini_balls_seq<span class="token operator">/</span>
-  <span class="token operator">-</span> hp_search_logs<span class="token operator">/</span>             <span class="token comment"># Dossier des logs d&apos;execution des recherches d&apos;hyperparam&#xE8;tres (&apos;../src/hp.py&apos;)</span>
   <span class="token operator">-</span> docs<span class="token operator">/</span>
-    <span class="token operator">-</span> rapport<span class="token punctuation">.</span>md                <span class="token comment"># Ce rapport au format originel (markdown)</span>
-    <span class="token operator">-</span> rapport<span class="token punctuation">.</span>html
-    <span class="token operator">-</span> ball_detection_hp_search_results<span class="token punctuation">.</span>html
     <span class="token operator">-</span> figures<span class="token operator">/</span>                  <span class="token comment"># Dossier d&apos;images/figures contenues dans ce rapport</span>
-  <span class="token operator">-</span> download_dataset<span class="token punctuation">.</span>sh         <span class="token comment"># Script de t&#xE9;l&#xE9;chargement des datasets</span>
-  <span class="token operator">-</span> environement<span class="token punctuation">.</span>yml            <span class="token comment"># Environement conda, d&#xE9;finit les d&#xE9;pendances</span>
-  <span class="token operator">-</span> LICENSE
+    <span class="token operator">-</span> hp_search_logs<span class="token operator">/</span>           <span class="token comment"># Dossier des logs d&apos;execution des recherches d&apos;hyperparam&#xE8;tres (&apos;../src/hp.py&apos;)</span>
+    <span class="token operator">-</span> rapport<span class="token punctuation">.</span>md                <span class="token comment"># Ce rapport au format originel (markdown)</span>
+    <span class="token operator">-</span> hp_search_results<span class="token punctuation">.</span>html    <span class="token comment"># Annexe issue du notebook du m&#xEA;me nom</span>
+    <span class="token operator">-</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>                       <span class="token comment"># Diverses versions du rapport et de l&apos;annexe export&#xE9;es en PDF et HTML</span>
   <span class="token operator">-</span> README<span class="token punctuation">.</span>md
+  <span class="token operator">-</span> LICENSE
+  <span class="token operator">-</span> environement<span class="token punctuation">.</span>yml            <span class="token comment"># Environement conda, d&#xE9;finit les d&#xE9;pendances</span>
+  <span class="token operator">-</span> download_dataset<span class="token punctuation">.</span>sh         <span class="token comment"># Script de t&#xE9;l&#xE9;chargement des datasets</span>
   <span class="token operator">-</span> <span class="token punctuation">.</span>gitignore
-</pre>
-    <h4 class="mume-header"
-      id="tests-pr%C3%A9liminaires-avec-fastai-voir-notebooks-brouillons-test_fastaiipynb-test_fastai-bboxipynb">Tests
-      pr&#xE9;liminaires avec fastai (voir notebooks &apos;brouillons&apos; <code>test_fastai.ipynb</code>
-      <code>test_fastai-bbox.ipynb</code>)</h4>
+</pre><h4 class="mume-header" id="tests-pr%C3%A9liminaires-avec-fastai-voir-notebooks-brouillons-test_fastaiipynb-test_fastai-bboxipynb">Tests pr&#xE9;liminaires avec fastai (voir notebooks &apos;brouillons&apos; <code>test_fastai.ipynb</code> <code>test_fastai-bbox.ipynb</code>)</h4>
 
-    <p>Dans un premier temps, avant de coder l&apos;approche avec des mod&#xE8;les Pytorch personalis&#xE9;s. Des
-      premiers tests on &#xE9;t&#xE9; fait avec fastai pour avoir une id&#xE9;e de la difficult&#xE9; de la
-      premi&#xE8;re t&#xE2;che et ainsi avoir une baseline. L&apos;approche avec fastai, certes tr&#xE8;s peut
-      didactique ou optimis&#xE9;e en termes de taille de mod&#xE8;le, permet des r&#xE9;sultats assez corrects de
-      mani&#xE8;re tr&#xE8;s rapide. Il s&apos;agissait de tester des mod&#xE8;les connus (e.g. variantes de ResNet)
-      pr&#xE9;entrainn&#xE9;s sur des images ImageNet ou autre. Un rapide fine-tunning sur le dataset de
-      d&#xE9;t&#xE9;ction de balles permet d&apos;obtenir un detection raisonable en 3-4 lignes de code.<br>
-      Une des fonctionalit&#xE9;s &#xE9;galement interessantes de fastai est l&apos;impl&#xE9;mentation d&apos;un
-      m&#xE9;thode pour d&#xE9;terminer un meilleur learning rate sans avoir &#xE0; executer une recherche
-      d&apos;hyperprametres classique (type random-search): le learning rate est d&#xE9;termin&#xE9; le temps d&apos;une
-      seule &#xE9;poque en changeant le learning rate &#xE0; chaque batch d&apos;entrainement (voir <a
-        href="https://docs.fast.ai/callbacks.lr_finder.html">callbacks.lr_finder de fastai</a>).<br>
-      Cette approche pr&#xE9;liminaire a permit de mieux connaitre les avantages et inconv&#xE9;nients d&apos;une
-      utilisation tr&#xE8;s basique de fastai (en effet, fastai n&apos;emp&#xEA;che pas un controle complet sur le
-      mod&#xE8;le entrain&#xE9; et la proc&#xE9;dure d&apos;entrainement). Les r&#xE9;sultats obtenus permettent dans la
-      suite de pouvoir mieux interpreter les valeurs des m&#xE9;triques sur ce dataset (donne une baseline raisonnable).
-    </p>
-    <h4 class="mume-header" id="petites-optimizations-du-code">Petites optimizations du code</h4>
+<p>Dans un premier temps, avant de coder l&apos;approche avec des mod&#xE8;les Pytorch personalis&#xE9;s. Des premiers tests on &#xE9;t&#xE9; fait avec fastai pour avoir une id&#xE9;e de la difficult&#xE9; de la premi&#xE8;re t&#xE2;che et ainsi avoir une baseline. L&apos;approche avec fastai, certes tr&#xE8;s peut didactique ou optimis&#xE9;e en termes de taille de mod&#xE8;le, permet des r&#xE9;sultats assez corrects de mani&#xE8;re tr&#xE8;s rapide. Il s&apos;agissait de tester des mod&#xE8;les connus (e.g. variantes de ResNet) pr&#xE9;entrainn&#xE9;s sur des images ImageNet ou autre. Un rapide fine-tunning sur le dataset de d&#xE9;t&#xE9;ction de balles permet d&apos;obtenir un detection raisonable en 3-4 lignes de code.<br>
+Une des fonctionalit&#xE9;s &#xE9;galement interessantes de fastai est l&apos;impl&#xE9;mentation d&apos;un m&#xE9;thode pour d&#xE9;terminer un meilleur learning rate sans avoir &#xE0; executer une recherche d&apos;hyperprametres classique (type random-search): le learning rate est d&#xE9;termin&#xE9; le temps d&apos;une seule &#xE9;poque en changeant le learning rate &#xE0; chaque batch d&apos;entrainement (voir <a href="https://docs.fast.ai/callbacks.lr_finder.html">callbacks.lr_finder de fastai</a>).<br>
+Cette approche pr&#xE9;liminaire a permit de mieux connaitre les avantages et inconv&#xE9;nients d&apos;une utilisation tr&#xE8;s basique de fastai (en effet, fastai n&apos;emp&#xEA;che pas un controle complet sur le mod&#xE8;le entrain&#xE9; et la proc&#xE9;dure d&apos;entrainement). Les r&#xE9;sultats obtenus permettent dans la suite de pouvoir mieux interpreter les valeurs des m&#xE9;triques sur ce dataset (donne une baseline raisonnable).</p>
+<h4 class="mume-header" id="petites-optimizations-du-code">Petites optimizations du code</h4>
 
-    <ul>
-      <li>Le(s) GPU disponnibles seront utilis&#xE9;s automatiquement si possible:</li>
-    </ul>
-    <pre data-role="codeBlock" data-info="python" class="language-python"><span class="token comment"># Device donn&#xE9; en argument de la fonction &apos;.to(DEVICE)&apos; des torch.Tensor</span>
+<ul>
+<li>Le(s) GPU disponnibles seront utilis&#xE9;s automatiquement si possible:</li>
+</ul>
+<pre data-role="codeBlock" data-info="python" class="language-python"><span class="token comment"># Device donn&#xE9; en argument de la fonction &apos;.to(DEVICE)&apos; des torch.Tensor</span>
 DEVICE <span class="token operator">=</span> torch<span class="token punctuation">.</span>device<span class="token punctuation">(</span><span class="token string">&apos;cuda&apos;</span><span class="token punctuation">)</span> <span class="token keyword">if</span> torch<span class="token punctuation">.</span>cuda<span class="token punctuation">.</span>is_available<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">else</span> torch<span class="token punctuation">.</span>device<span class="token punctuation">(</span><span class="token string">&apos;cpu&apos;</span><span class="token punctuation">)</span>
-</pre>
-    <ul>
-      <li>Les dataloaders utilisent plusieur sous-processus en fonction du nombre de coeurs CPU disponnibles sur la
-        machine (param&#xE8;tre <strong><code>num_workers</code></strong> des Dataloader-s) :</li>
-    </ul>
-    <pre data-role="codeBlock" data-info="python" class="language-python"><span class="token comment"># Nombre de &apos;thread&apos; utilis&#xE9;s pour chaque dataloader</span>
+</pre><ul>
+<li>Les dataloaders utilisent plusieur sous-processus en fonction du nombre de coeurs CPU disponnibles sur la machine (param&#xE8;tre <strong><code>num_workers</code></strong> des Dataloader-s) :</li>
+</ul>
+<pre data-role="codeBlock" data-info="python" class="language-python"><span class="token comment"># Nombre de &apos;thread&apos; utilis&#xE9;s pour chaque dataloader</span>
 _DEFAULT_WORKERS <span class="token operator">=</span> <span class="token number">0</span> <span class="token keyword">if</span> __debug__ <span class="token keyword">else</span> <span class="token builtin">min</span><span class="token punctuation">(</span>os<span class="token punctuation">.</span>cpu_count<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> os<span class="token punctuation">.</span>cpu_count<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">//</span> <span class="token number">4</span><span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token builtin">max</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> torch<span class="token punctuation">.</span>cuda<span class="token punctuation">.</span>device_count<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-</pre>
-    <ul>
-      <li>Pour une meilleure optimization des op&#xE9;rations de Pytorch sur GPU, on peut activer l&apos;auto-tuning
-        (bas&#xE9; sur un benchmark) de la librairie CuDNN s&apos;ajoutant &#xE0; CUDA. CuDNN est une librairie de
-        NVidia (un fichier cpp et une header C++ ajout&#xE9; au toolkit CUDA) qui offre des optimisations
-        sp&#xE9;cifiques aux r&#xE9;seaux de neurones (Convolutions, produits de matrices, calcul du gradient, ...).
-        CuDNN est int&#xE9;gr&#xE9; &#xE0; Pytorch comme pour CUDA qui est simplement une d&#xE9;pendance install&#xE9;e
-        dans l&apos;environement Conda.<br>
-        Pytorch permet d&apos;am&#xE9;liorer les performances de CuDNN d&apos;avantage avec les param&#xE8;tres
-        <strong><code>cudnn.benchmark</code></strong> et <strong><code>cudnn.fastest</code></strong>. Cependant, activer
-        le benchmarking de CuDNN dans Pytorch peut impacter la reproducibilit&#xE9; des r&#xE9;sultats &#xE9;tant
-        donn&#xE9; que ce n&apos;est pas un processus d&#xE9;terministe (m&#xEA;me avec
-        <strong><code>torch.backends.cudnn.deterministic = True</code></strong>).<br>
-        On observe une am&#xE9;lioration de la vitesse d&apos;entrainement entre 30% et 40% pour les mod&#xE8;les
-        Pytorch de detection et de pr&#xE9;diction de position de balles:</li>
-    </ul>
-    <pre data-role="codeBlock" data-info="python" class="language-python"><span class="token comment"># Torch CuDNN configuration</span>
+</pre><ul>
+<li>Pour une meilleure optimization des op&#xE9;rations de Pytorch sur GPU, on peut activer l&apos;auto-tuning (bas&#xE9; sur un benchmark) de la librairie CuDNN s&apos;ajoutant &#xE0; CUDA. CuDNN est une librairie de NVidia (un fichier cpp et une header C++ ajout&#xE9; au toolkit CUDA) qui offre des optimisations sp&#xE9;cifiques aux r&#xE9;seaux de neurones (Convolutions, produits de matrices, calcul du gradient, ...). CuDNN est int&#xE9;gr&#xE9; &#xE0; Pytorch comme pour CUDA qui est simplement une d&#xE9;pendance install&#xE9;e dans l&apos;environement Conda.<br>
+Pytorch permet d&apos;am&#xE9;liorer les performances de CuDNN d&apos;avantage avec les param&#xE8;tres <strong><code>cudnn.benchmark</code></strong> et <strong><code>cudnn.fastest</code></strong>. Cependant, activer le benchmarking de CuDNN dans Pytorch peut impacter la reproducibilit&#xE9; des r&#xE9;sultats &#xE9;tant donn&#xE9; que ce n&apos;est pas un processus d&#xE9;terministe (m&#xEA;me avec <strong><code>torch.backends.cudnn.deterministic = True</code></strong>).<br>
+On observe une am&#xE9;lioration de la vitesse d&apos;entrainement entre 30% et 40% pour les mod&#xE8;les Pytorch de detection et de pr&#xE9;diction de position de balles:</li>
+</ul>
+<pre data-role="codeBlock" data-info="python" class="language-python"><span class="token comment"># Torch CuDNN configuration</span>
 torch<span class="token punctuation">.</span>backends<span class="token punctuation">.</span>cudnn<span class="token punctuation">.</span>deterministic <span class="token operator">=</span> <span class="token boolean">True</span>
 cudnn<span class="token punctuation">.</span>benchmark <span class="token operator">=</span> torch<span class="token punctuation">.</span>cuda<span class="token punctuation">.</span>is_available<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment"># Enable builtin CuDNN auto-tuner, TODO: benchmarking isn&apos;t deterministic, disable this if this is an issue (and disable parallelization to which isn&apos;t deterministic neither)</span>
 cudnn<span class="token punctuation">.</span>fastest <span class="token operator">=</span> torch<span class="token punctuation">.</span>cuda<span class="token punctuation">.</span>is_available<span class="token punctuation">(</span><span class="token punctuation">)</span>  <span class="token comment"># Disable this if memory issues</span>
-</pre>
-    <ul>
-      <li>
-        <p>Les performances ont aussi &#xE9;t&#xE9; un facteur important dans les choix d&apos;hyperparam&#xE8;tres et
-          d&apos;architecture des mod&#xE8;les (espace de recherche des hyperparametres avec hyperopt). Par exemple,
-          l&apos;architecture du detecteur contient des couches de convolution avec du <em>average pooling</em>
-          (remplacant le &apos;stride&apos; de 2 dans les derni&#xE8;res variantes du mod&#xE8;le) pour r&#xE9;duire la
-          quantit&#xE9;e de param&#xE8;tres et de features &#xE0; traiter. Les deux mod&#xE8;les ont un nombre total de
-          couches relativement faibles. Pareillement, le nombre de filtres de convolution, la taille des filtres (3x3
-          ou, plus haut dans la convolution, 5x5) et la largeur des couches fully-connected ont &#xE9;t&#xE9; choisis,
-          en autre, pour &#xEA;tre assez faibles &#xE9;tant donn&#xE9; la simplicit&#xE9; aparante de la t&#xE2;che de
-          d&#xE9;tection et pour permettre un entrainement plus rapide.</p>
-      </li>
-      <li>
-        <p>Les entrainements des mod&#xE8;les sont &#xE9;galement acc&#xE9;l&#xE9;r&#xE9;s en parallelisant les
-          &apos;training steps&apos; sur plusieurs GPUs automatiquement avec <strong><code>model =
-              nn.DataParallel(model)</code></strong> (voir la fonction <strong><code>paralellize(model: nn.Module) -&gt;
-              nn.Module</code></strong> dans <strong><code>../src/balldetect/torch_utils.py</code></strong>). Les
-          mod&#xE8;les ont &#xE9;t&#xE9; entrain&#xE9; sur une machine personnelle dot&#xE9;e de deux NVidia 1080 ti; La
-          paral&#xE8;llisation des donn&#xE9;es avec cette fonction automatique de Pytorch vas donc executer deux
-          entrainements en parall&#xE8;le et synchroniser les gradients &#xE0; chaque &#xE9;tapes de mani&#xE8;re
-          synchrone en calculant la moyenne des deux &apos;training steps&apos; avant de passer &#xE0;
-          l&apos;entrainement sur les prochains batchs.<br>
-          De par le besoin de synchronisation des gradients, le mod&#xE8;le et/ou les donn&#xE9;es/batch_size doivent
-          &#xEA;tre assez volumineux pour que cette parall&#xE8;lisation offre une acc&#xE9;l&#xE9;ration de
-          l&apos;entrainement par rapport &#xE0; l&apos;utilisation d&apos;un seul GPU.<br>
-          Par exemple, on observe pour le mod&#xE8;le de detection de balles qu&apos;il faut une
-          <strong><code>batch_size</code></strong> souvent sup&#xE9;rieure &#xE0; 64 pour que les deux 1080 ti soit
-          utilis&#xE9;es au del&#xE0; de 50% (nvidia-smi). Cependant, trop augmenter la batch_size peut poser des
-          probl&#xE8;mes, notamment &#xE0; cause de la taille limit&#xE9;e du dataset et, pour des mod&#xE8;les plus
-          importants, pourrais demander une quantit&#xE9;e de m&#xE9;moire vid&#xE9;o trop grande.</p>
-      </li>
-    </ul>
-    <h4 class="mume-header"
-      id="tache-1-mod%C3%A8le-de-detection-de-balles-voir-srcballdetectball_detectorpysrcballdetectball_detectorpy-et-les-hyperparam%C3%A8tres-associ%C3%A9s-dans-srctrainpysrctrainpy">
-      Tache 1: Mod&#xE8;le de detection de balles (voir <a
-        href="../src/balldetect/ball_detector.py">../src/balldetect/ball_detector.py</a> et les hyperparam&#xE8;tres
-      associ&#xE9;s dans <a href="../src/train.py">../src/train.py</a>)</h4>
+</pre><ul>
+<li>
+<p>Les performances ont aussi &#xE9;t&#xE9; un facteur important dans les choix d&apos;hyperparam&#xE8;tres et d&apos;architecture des mod&#xE8;les (espace de recherche des hyperparametres avec hyperopt). Par exemple, l&apos;architecture du detecteur contient des couches de convolution avec du <em>average pooling</em> (remplacant le &apos;stride&apos; de 2 dans les derni&#xE8;res variantes du mod&#xE8;le) pour r&#xE9;duire la quantit&#xE9;e de param&#xE8;tres et de features &#xE0; traiter. Les deux mod&#xE8;les ont un nombre total de couches relativement faibles. Pareillement, le nombre de filtres de convolution, la taille des filtres (3x3 ou, plus haut dans la convolution, 5x5) et la largeur des couches fully-connected ont &#xE9;t&#xE9; choisis, en autre, pour &#xEA;tre assez faibles &#xE9;tant donn&#xE9; la simplicit&#xE9; aparante de la t&#xE2;che de d&#xE9;tection et pour permettre un entrainement plus rapide.</p>
+</li>
+<li>
+<p>Les entrainements des mod&#xE8;les sont &#xE9;galement acc&#xE9;l&#xE9;r&#xE9;s en parallelisant les &apos;training steps&apos; sur plusieurs GPUs automatiquement avec <strong><code>model = nn.DataParallel(model)</code></strong> (voir la fonction <strong><code>paralellize(model: nn.Module) -&gt; nn.Module</code></strong> dans <strong><code>../src/balldetect/torch_utils.py</code></strong>). Les mod&#xE8;les ont &#xE9;t&#xE9; entrain&#xE9; sur une machine personnelle dot&#xE9;e de deux NVidia 1080 ti; La paral&#xE8;llisation des donn&#xE9;es avec cette fonction automatique de Pytorch vas donc executer deux entrainements en parall&#xE8;le et synchroniser les gradients &#xE0; chaque &#xE9;tapes de mani&#xE8;re synchrone en calculant la moyenne des deux &apos;training steps&apos; avant de passer &#xE0; l&apos;entrainement sur les prochains batchs.<br>
+De par le besoin de synchronisation des gradients, le mod&#xE8;le et/ou les donn&#xE9;es/batch_size doivent &#xEA;tre assez volumineux pour que cette parall&#xE8;lisation offre une acc&#xE9;l&#xE9;ration de l&apos;entrainement par rapport &#xE0; l&apos;utilisation d&apos;un seul GPU.<br>
+Par exemple, on observe pour le mod&#xE8;le de detection de balles qu&apos;il faut une <strong><code>batch_size</code></strong> souvent sup&#xE9;rieure &#xE0; 64 pour que les deux 1080 ti soit utilis&#xE9;es au del&#xE0; de 50% (nvidia-smi). Cependant, trop augmenter la batch_size peut poser des probl&#xE8;mes, notamment &#xE0; cause de la taille limit&#xE9;e du dataset et, pour des mod&#xE8;les plus importants, pourrais demander une quantit&#xE9;e de m&#xE9;moire vid&#xE9;o trop grande.</p>
+</li>
+</ul>
+<h4 class="mume-header" id="tache-1-mod%C3%A8le-de-detection-de-balles-voir-srcballdetectball_detectorpysrcballdetectball_detectorpy-et-les-hyperparam%C3%A8tres-associ%C3%A9s-dans-srctrainpysrctrainpy">Tache 1: Mod&#xE8;le de detection de balles (voir <a href="../src/balldetect/ball_detector.py">../src/balldetect/ball_detector.py</a> et les hyperparam&#xE8;tres associ&#xE9;s dans <a href="../src/train.py">../src/train.py</a>)</h4>
 
-    <p>Le mod&#xE8;le que nous avons construit pour la d&#xE9;tection de balles devait dans un premier temps ne
-      d&#xE9;tecter que les couleurs de balles et non leur positions dans l&apos;image (bounding boxes).<br>
-      Dans un second temps, nous avons modifi&#xE9; le mod&#xE8;le pour inf&#xE9;rer &#xE9;galement les bounding boxes.
-      Les donn&#xE9;es issues du dataset ayant une redondance, en autre, au niveau des couleurs de balles (information
-      de couleur pr&#xE9;sente &#xE0; la fois dans l&apos;ordre des bounding boxes et dans le vecteur de couleurs), nous
-      avons impl&#xE9;ment&#xE9; deux alternative :</p>
-    <ul>
-      <li>Une premi&#xE8;re o&#xF9; le mod&#xE8;le est entrain&#xE9; directement &#xE0; inf&#xE8;rer les 9 bounding
-        boxes ainsi que le vecteur de couleurs (dont 6 sont &#xE0; 0 pour une image donn&#xE9;e)</li>
-      <li>Une seconde variant o&#xF9; les bounding boxes sont pr&#xE9;trait&#xE9;e pour en enlever les vecteurs nuls :
-        seul 3 bounding boxes sont inf&#xE9;r&#xE9;es en plus du vecteur de couleurs (le vecteur de couleurs
-        inf&#xE9;r&#xE9; alors par le mod&#xE8;le d&#xE9;finit la position bounding boxes en sortie (voir
-        <strong><code>BallsCFDetection.__getitem__</code></strong> et <strong><code>retrieve_data</code></strong> dans
-        <a href="../src/balldetect/datasets.py">../src/balldetect/datasets.py</a>) : le mod&#xE8;le fait donne donc en
-        sortie une r&#xE9;gression de 3 bounding boxes (3x4 coordonn&#xE9;es) et une <em>multi-label
-          classsification</em> pour donner en sortie le vecteur de couleurs (9 valeurs binaires, dont 3 sont &#xE0; 1 et
-        les autres &#xE0; 0)</li>
-    </ul>
-    <p>J&apos;ai &#xE9;galement test&#xE9; rappidement une autre alternative o&#xF9; seul les bounding boxes sont
-      inf&#xE9;r&#xE9;es et la couleur est d&#xE9;duite de la position des trois vecteurs de coordonn&#xE9;es maximaux;
-      Mais &#xE9;tant donn&#xE9; que la t&#xE2;che demand&#xE9;e dans le sujet implique que le mod&#xE8;le inf&#xE8;re
-      &#xE0; la fois le vecteur de couleurs et les boudning boxes (d&apos;apr&#xE8;s ma compr&#xE9;hension du sujet), je
-      n&apos;ai pas explor&#xE9; cette variante d&apos;avantage.</p>
-    <p>Un r&#xE9;sultat interessant que j&apos;ai p&#xFB; observer est qu&apos;inf&#xE9;rer seulement 3 bounding boxes
-      au lieu de 9 dont 6 nulles n&apos;am&#xE9;liore pas forc&#xE9;ment les performances du mod&#xE8;le, voir le
-      contraire. Cette observation peut avoir plusieur explication :<br>
-      Comme expliqu&#xE9; &#xE0; l&apos;introduction, la structure de donn&#xE9;es pour les bounding boxes dans une
-      matrice de 9 vecteurs de coordon&#xE9;es est plus simple/claire au niveau de l&apos;ordre/position des vecteurs de
-      coordonn&#xE9;es, alors que l&apos;inf&#xE9;rence de 3 bounding boxes, m&#xEA;me avec l&apos;ordre initial
-      conserv&#xE9;, a moins de sens.<br>
-      Il est &#xE9;galement possible que ce r&#xE9;sultat soit d&#xFB; &#xE0; d&apos;autres probl&#xE8;mes dans le
-      mod&#xE8;le qui ont &#xE9;t&#xE9; r&#xE9;soluts par la suite, sans avoir r&#xE9;&#xE9;valu&#xE9; l&apos;interet de
-      cette simplification des bounding boxes.</p>
-    <p>La loss utilis&#xE9;e pour entrainer le mod&#xE8;le est l&apos;addiction de deux termes/m&#xE9;triques :</p>
-    <ul>
-      <li>Le premier terme de la loss est la m&#xE9;trique BCE (<strong><em>Binary Cross Entropy</em></strong>)
-        &#xE9;valuant la qualit&#xE9; de la classification &apos;multi-label&apos; sur le vecteur binaire de couleurs.
-        Ce terme est multipl&#xE9; un hyperparam&#xE8;tre avant d&apos;&#xEA;tre ajout&#xE9; au deuxi&#xE8;me terme de
-        la loss (facteur souvent mis &#xE0; : <strong><code>bce_loss_scale=0.1</code></strong>)</li>
-      <li>Le second terme est la m&#xE9;trique MSE (<strong><em>Mean Squared Error</em></strong>) minimisant
-        l&apos;erreur au quarr&#xE9; moyenne sur la r&#xE9;gression des coordonn&#xE9;es des bounding boxes.</li>
-    </ul>
-    <p>Le mod&#xE8;le est compos&#xE9; d&apos;un &apos;<em>convolution backbone</em>&apos; suivit d&apos;une ou
-      plusieurs couches denses (<em>fully connected layer</em>). L&apos;architecture du mod&#xE8;le contient
-      &#xE9;galement des couches <strong><code>nn.AvgPooling2d</code></strong> dans le <em>backbone</em> de
-      convolutions.<br>
-      Nous avons impl&#xE9;ment&#xE9; l&apos;architecture de mani&#xE8;re relativement g&#xE9;n&#xE9;rique de
-      mani&#xE8;re &#xE0; pouvoir en d&#xE9;finir facilement des variantes dans les hyperparam&#xE8;tres.</p>
-    <p>Une couche de convolution ou dense (<strong><code>nn.Conv2d</code></strong> ou
-      <strong><code>nn.Linear</code></strong>) peut-&#xEA;tre compos&#xE9;e d&apos;une fonction d&apos;activation
-      (hyperparametre <strong><code>architecture.act_fn</code></strong>), de <em>dropout</em> (si
-      <strong><code>architecture.dropout_prob != 1.</code></strong>), de <em>batch normalization</em> (si
-      <strong><code>architecture.batch_norm</code></strong> d&#xE9;finit les param&#xE8;tres
-      <strong>&apos;eps&apos;</strong> et <strong>&apos;momentum&apos;</strong>). Voir <a
-        href="../src/balldetect/torch_utils.py">../src/balldetect/torch_utils.py</a> pour plus de d&#xE9;tails sur
-      l&apos;impl&#xE9;mentation des couches.<br>
-      Pour ce mod&#xE8;le, nous avons principalement explor&#xE9; les fonctions d&apos;activation
-      <strong><code>nn.ReLU</code></strong> et <strong><code>nn.LeakyReLU</code></strong>.<br>
-      Les tailles de filtres de convolutions consid&#xE8;r&#xE9;es sont principalement de <strong>3x3</strong>,
-      <strong>5x5</strong> et parfois <strong>7x7</strong> et <strong>1x1</strong> (avec des padding correspondant).
-      Nous avons &#xE9;galement explor&#xE9; l&apos;utilisation de stride &#xE0; 2 ou 4 avant de remplacer cette
-      pratique par de l&apos;average pooling.</p>
-    <p>Le Mod&#xE8;le a &#xE9;t&#xE9; entrain&#xE9; sur le dataset <strong><code>mini_balls</code></strong> compos&#xE9;
-      de 20000 images. Le dataset est d&#xE9;coup&#xE9; al&#xE9;atoirement en un &apos;trainset&apos; (90% du dataset)
-      et un &apos;validset&apos; (10% du dataset). Malheureusement, nous n&apos;avons pas eu le temps d&apos;implementer
-      une cross-validation qui aurais &#xE9;t&#xE9; utile &#xE9;tant donn&#xE9; la petite taille du dataset. En effet,
-      dans cette configuration, le validset est un peu trop petit et il risque d&apos;y avoir des instabilit&#xE9;s sur
-      les valeurs des m&#xE9;triques d&apos;&#xE9;valuation qui pourrait, en autre, fausser la recherche
-      d&apos;hyperparam&#xE8;tres. De plus, nous n&apos;avons pas cr&#xE9;&#xE9; de &apos;testset&apos; pour une
-      &#xE9;valuation plus ponctuelle par crainte de perdre d&apos;avantage de donn&#xE9;es d&apos;entrainement avec un
-      dataset de cette taille. Cepandant, il aurait peut-&#xEA;tre &#xE9;t&#xE9; pertinant d&apos;en cr&#xE9;er un pour
-      mesurer la pr&#xE9;sence d&apos;overfitting sur le validset d&#xFB; &#xE0; la recherche d&apos;hyperparametres.
-    </p>
-    <p>La recherche d&apos;hyperparam&#xE8;tre &#xE0; permit de trouver de bien meilleurs param&#xE8;tres
-      d&apos;entrainement et choisir la bonne variante d&apos;architecture parmit celles d&#xE9;finies dans
-      l&apos;espace d&apos;hyperparam&#xE8;tres. Nous avons p&#xFB; d&#xE9;finir plusieurs espaces
-      d&apos;hyperparam&#xE8;tres relativement restreints &#xE0; la lumi&#xE8;re des r&#xE9;sultats obtenus avec des
-      param&#xE8;tres d&#xE9;finit subjectivement.<br>
-      Ci-dessous, les deux derniers espace de recherche d&apos;hyperparam&#xE8;tres utilis&#xE9;s avec hyperopt pour la
-      d&#xE9;tection de balles dans <strong><code>../src/hp.py</code></strong> (algorithme
-      <strong><code>tpe.suggest</code></strong> avec 2x100 entrainements de 90 epochs et un early_stopping de 12
-      epochs):</p>
-    <p><strong>L&apos;un des premiers espace de recherche d&apos;hyperparam&#xE8;tres utilis&#xE9; :</strong></p>
-    <p><strong>&gt; NOTE: <em>L&apos;architecture est d&#xE9;finie ici (par <code>&apos;conv2d_params&apos;</code> et
-          <code>&apos;fc_params&apos;</code>) de mani&#xE8;re diff&#xE9;rente du code actuel, de par un refactoring
-          rendant plus g&#xE9;n&#xE9;rique la d&#xE9;finition de l&apos;architecture avec les hyperparm&#xE8;tres
-          (legacy hp search space)</em> :</strong></p>
-    <pre data-role="codeBlock" data-info="python" class="language-python">hp_space <span class="token operator">=</span> <span class="token punctuation">{</span>
+<p>Le mod&#xE8;le que nous avons construit pour la d&#xE9;tection de balles devait dans un premier temps ne d&#xE9;tecter que les couleurs de balles et non leur positions dans l&apos;image (bounding boxes).<br>
+Dans un second temps, nous avons modifi&#xE9; le mod&#xE8;le pour inf&#xE9;rer &#xE9;galement les bounding boxes. Les donn&#xE9;es issues du dataset ayant une redondance, en autre, au niveau des couleurs de balles (information de couleur pr&#xE9;sente &#xE0; la fois dans l&apos;ordre des bounding boxes et dans le vecteur de couleurs), nous avons impl&#xE9;ment&#xE9; deux alternative :</p>
+<ul>
+<li>Une premi&#xE8;re o&#xF9; le mod&#xE8;le est entrain&#xE9; directement &#xE0; inf&#xE8;rer les 9 bounding boxes ainsi que le vecteur de couleurs (dont 6 sont &#xE0; 0 pour une image donn&#xE9;e)</li>
+<li>Une seconde variant o&#xF9; les bounding boxes sont pr&#xE9;trait&#xE9;e pour en enlever les vecteurs nuls : seul 3 bounding boxes sont inf&#xE9;r&#xE9;es en plus du vecteur de couleurs (le vecteur de couleurs inf&#xE9;r&#xE9; alors par le mod&#xE8;le d&#xE9;finit la position bounding boxes en sortie (voir <strong><code>BallsCFDetection.__getitem__</code></strong> et <strong><code>retrieve_data</code></strong> dans <a href="../src/balldetect/datasets.py">../src/balldetect/datasets.py</a>) : le mod&#xE8;le fait donne donc en sortie une r&#xE9;gression de 3 bounding boxes (3x4 coordonn&#xE9;es) et une <em>multi-label classsification</em> pour donner en sortie le vecteur de couleurs (9 valeurs binaires, dont 3 sont &#xE0; 1 et les autres &#xE0; 0)</li>
+</ul>
+<p>J&apos;ai &#xE9;galement test&#xE9; rappidement une autre alternative o&#xF9; seul les bounding boxes sont inf&#xE9;r&#xE9;es et la couleur est d&#xE9;duite de la position des trois vecteurs de coordonn&#xE9;es maximaux; Mais &#xE9;tant donn&#xE9; que la t&#xE2;che demand&#xE9;e dans le sujet implique que le mod&#xE8;le inf&#xE8;re &#xE0; la fois le vecteur de couleurs et les boudning boxes (d&apos;apr&#xE8;s ma compr&#xE9;hension du sujet), je n&apos;ai pas explor&#xE9; cette variante d&apos;avantage.</p>
+<p>Un r&#xE9;sultat interessant que j&apos;ai p&#xFB; observer est qu&apos;inf&#xE9;rer seulement 3 bounding boxes au lieu de 9 dont 6 nulles n&apos;am&#xE9;liore pas forc&#xE9;ment les performances du mod&#xE8;le, voir le contraire. Cette observation peut avoir plusieur explication :<br>
+Comme expliqu&#xE9; &#xE0; l&apos;introduction, la structure de donn&#xE9;es pour les bounding boxes dans une matrice de 9 vecteurs de coordon&#xE9;es est plus simple/claire au niveau de l&apos;ordre/position des vecteurs de coordonn&#xE9;es, alors que l&apos;inf&#xE9;rence de 3 bounding boxes, m&#xEA;me avec l&apos;ordre initial conserv&#xE9;, a moins de sens.<br>
+Il est &#xE9;galement possible que ce r&#xE9;sultat soit d&#xFB; &#xE0; d&apos;autres probl&#xE8;mes dans le mod&#xE8;le qui ont &#xE9;t&#xE9; r&#xE9;soluts par la suite, sans avoir r&#xE9;&#xE9;valu&#xE9; l&apos;interet de cette simplification des bounding boxes.</p>
+<p>La loss utilis&#xE9;e pour entrainer le mod&#xE8;le est l&apos;addiction de deux termes/m&#xE9;triques :</p>
+<ul>
+<li>Le premier terme de la loss est la m&#xE9;trique BCE (<strong><em>Binary Cross Entropy</em></strong>) &#xE9;valuant la qualit&#xE9; de la classification &apos;multi-label&apos; sur le vecteur binaire de couleurs.  Ce terme est multipl&#xE9; un hyperparam&#xE8;tre avant d&apos;&#xEA;tre ajout&#xE9; au deuxi&#xE8;me terme de la loss (facteur souvent mis &#xE0; : <strong><code>bce_loss_scale=0.1</code></strong>)</li>
+<li>Le second terme est la m&#xE9;trique MSE (<strong><em>Mean Squared Error</em></strong>) minimisant l&apos;erreur au quarr&#xE9; moyenne sur la r&#xE9;gression des coordonn&#xE9;es des bounding boxes.</li>
+</ul>
+<p>Le mod&#xE8;le est compos&#xE9; d&apos;un &apos;<em>convolution backbone</em>&apos; suivit d&apos;une ou plusieurs couches denses (<em>fully connected layer</em>). L&apos;architecture du mod&#xE8;le contient &#xE9;galement des couches <strong><code>nn.AvgPooling2d</code></strong> dans le <em>backbone</em> de convolutions.<br>
+Nous avons impl&#xE9;ment&#xE9; l&apos;architecture de mani&#xE8;re relativement g&#xE9;n&#xE9;rique de mani&#xE8;re &#xE0; pouvoir en d&#xE9;finir facilement des variantes dans les hyperparam&#xE8;tres.</p>
+<p>Une couche de convolution ou dense (<strong><code>nn.Conv2d</code></strong> ou <strong><code>nn.Linear</code></strong>) peut-&#xEA;tre compos&#xE9;e d&apos;une fonction d&apos;activation (hyperparametre <strong><code>architecture.act_fn</code></strong>), de <em>dropout</em> (si <strong><code>architecture.dropout_prob != 1.</code></strong>), de <em>batch normalization</em> (si <strong><code>architecture.batch_norm</code></strong> d&#xE9;finit les param&#xE8;tres <strong>&apos;eps&apos;</strong> et <strong>&apos;momentum&apos;</strong>). Voir <a href="../src/balldetect/torch_utils.py">../src/balldetect/torch_utils.py</a> pour plus de d&#xE9;tails sur l&apos;impl&#xE9;mentation des couches.<br>
+Pour ce mod&#xE8;le, nous avons principalement explor&#xE9; les fonctions d&apos;activation <strong><code>nn.ReLU</code></strong> et <strong><code>nn.LeakyReLU</code></strong>.<br>
+Les tailles de filtres de convolutions consid&#xE8;r&#xE9;es sont principalement de <strong>3x3</strong>, <strong>5x5</strong> et parfois <strong>7x7</strong> et <strong>1x1</strong> (avec des padding correspondant). Nous avons &#xE9;galement explor&#xE9; l&apos;utilisation de stride &#xE0; 2 ou 4 avant de remplacer cette pratique par de l&apos;average pooling.</p>
+<p>Le Mod&#xE8;le a &#xE9;t&#xE9; entrain&#xE9; sur le dataset <strong><code>mini_balls</code></strong> compos&#xE9; de 20000 images. Le dataset est d&#xE9;coup&#xE9; al&#xE9;atoirement en un &apos;trainset&apos; (90% du dataset) et un &apos;validset&apos; (10% du dataset). Malheureusement, nous n&apos;avons pas eu le temps d&apos;implementer une cross-validation qui aurais &#xE9;t&#xE9; utile &#xE9;tant donn&#xE9; la petite taille du dataset. En effet, dans cette configuration, le validset est un peu trop petit et il risque d&apos;y avoir des instabilit&#xE9;s sur les valeurs des m&#xE9;triques d&apos;&#xE9;valuation qui pourrait, en autre, fausser la recherche d&apos;hyperparam&#xE8;tres. De plus, nous n&apos;avons pas cr&#xE9;&#xE9; de &apos;testset&apos; pour une &#xE9;valuation plus ponctuelle par crainte de perdre d&apos;avantage de donn&#xE9;es d&apos;entrainement avec un dataset de cette taille. Cepandant, il aurait peut-&#xEA;tre &#xE9;t&#xE9; pertinant d&apos;en cr&#xE9;er un pour mesurer la pr&#xE9;sence d&apos;overfitting sur le validset d&#xFB; &#xE0; la recherche d&apos;hyperparametres.</p>
+<p>La recherche d&apos;hyperparam&#xE8;tre &#xE0; permit de trouver de bien meilleurs param&#xE8;tres d&apos;entrainement et choisir la bonne variante d&apos;architecture parmit celles d&#xE9;finies dans l&apos;espace d&apos;hyperparam&#xE8;tres. Nous avons p&#xFB; d&#xE9;finir plusieurs espaces d&apos;hyperparam&#xE8;tres relativement restreints &#xE0; la lumi&#xE8;re des r&#xE9;sultats obtenus avec des param&#xE8;tres d&#xE9;finit subjectivement.<br>
+Ci-dessous, les deux derniers espace de recherche d&apos;hyperparam&#xE8;tres utilis&#xE9;s avec hyperopt pour la d&#xE9;tection de balles dans <strong><code>../src/hp.py</code></strong> (algorithme <strong><code>tpe.suggest</code></strong> avec 2x100 entrainements de 90 epochs et un early_stopping de 12 epochs):</p>
+<p><strong>L&apos;un des premiers espace de recherche d&apos;hyperparam&#xE8;tres utilis&#xE9; :</strong></p>
+<p><strong>&gt; NOTE: <em>L&apos;architecture est d&#xE9;finie ici (par <code>&apos;conv2d_params&apos;</code> et <code>&apos;fc_params&apos;</code>) de mani&#xE8;re diff&#xE9;rente du code actuel, de par un refactoring rendant plus g&#xE9;n&#xE9;rique la d&#xE9;finition de l&apos;architecture avec les hyperparm&#xE8;tres (legacy hp search space)</em> :</strong></p>
+<pre data-role="codeBlock" data-info="python" class="language-python">hp_space <span class="token operator">=</span> <span class="token punctuation">{</span>
     <span class="token string">&apos;optimizer_params&apos;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">&apos;lr&apos;</span><span class="token punctuation">:</span> hp<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token string">&apos;lr&apos;</span><span class="token punctuation">,</span> <span class="token number">5e</span><span class="token operator">-</span><span class="token number">6</span><span class="token punctuation">,</span> <span class="token number">1e</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&apos;betas&apos;</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token number">0.9</span><span class="token punctuation">,</span> <span class="token number">0.999</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&apos;eps&apos;</span><span class="token punctuation">:</span> <span class="token number">1e</span><span class="token operator">-</span><span class="token number">8</span><span class="token punctuation">,</span>
                          <span class="token string">&apos;weight_decay&apos;</span><span class="token punctuation">:</span> hp<span class="token punctuation">.</span>loguniform<span class="token punctuation">(</span><span class="token string">&apos;weight_decay&apos;</span><span class="token punctuation">,</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">,</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&apos;amsgrad&apos;</span><span class="token punctuation">:</span> <span class="token boolean">False</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
     <span class="token string">&apos;scheduler_params&apos;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">&apos;step_size&apos;</span><span class="token punctuation">:</span> <span class="token number">40</span><span class="token punctuation">,</span> <span class="token string">&apos;gamma&apos;</span><span class="token punctuation">:</span> <span class="token number">0.2</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token comment"># LR Steps</span>
@@ -1300,10 +539,8 @@ cudnn<span class="token punctuation">.</span>fastest <span class="token operator
                                                 <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">&apos;out_features&apos;</span><span class="token punctuation">:</span> <span class="token number">64</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">&apos;out_features&apos;</span><span class="token punctuation">:</span> <span class="token number">128</span><span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
                                                 <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</pre>
-    <p><strong>Second/dernier espace de recherche d&apos;hyperparam&#xE8;tres (architecture des convolutions
-        fix&#xE9;e):</strong></p>
-    <pre data-role="codeBlock" data-info="python" class="language-python"><span class="token comment"># Ball detector Conv2d backbone layers (nouvelle fa&#xE7;on de d&#xE9;finir l&apos;architecture)</span>
+</pre><p><strong>Second/dernier espace de recherche d&apos;hyperparam&#xE8;tres (architecture des convolutions fix&#xE9;e):</strong></p>
+<pre data-role="codeBlock" data-info="python" class="language-python"><span class="token comment"># Ball detector Conv2d backbone layers (nouvelle fa&#xE7;on de d&#xE9;finir l&apos;architecture)</span>
 conv_backbone <span class="token operator">=</span> <span class="token punctuation">(</span>
       <span class="token punctuation">(</span><span class="token string">&apos;conv2d&apos;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">&apos;out_channels&apos;</span><span class="token punctuation">:</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token string">&apos;kernel_size&apos;</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&apos;padding&apos;</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
       <span class="token punctuation">(</span><span class="token string">&apos;conv2d&apos;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">&apos;out_channels&apos;</span><span class="token punctuation">:</span> <span class="token number">4</span><span class="token punctuation">,</span> <span class="token string">&apos;kernel_size&apos;</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&apos;padding&apos;</span><span class="token punctuation">:</span> <span class="token number">0</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
@@ -1343,11 +580,8 @@ detect_hp_space <span class="token operator">=</span> <span class="token punctua
                                                     <span class="token punctuation">(</span><span class="token operator">*</span>conv_backbone<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token string">&apos;fully_connected&apos;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</pre>
-    <p>La derni&#xE8;re recherche d&apos;hyperparam&#xE8;tres &#xE0; donn&#xE9;es les param&#xE8;tres
-      &quot;optimaux&quot; suivants (<strong><code>best_valid_loss=0.0031991</code></strong> apr&#xE8;s
-      <strong>82</strong> epcohs) :</p>
-    <pre data-role="codeBlock" data-info="python" class="language-python"><span class="token punctuation">{</span>
+</pre><p>La derni&#xE8;re recherche d&apos;hyperparam&#xE8;tres &#xE0; donn&#xE9;es les param&#xE8;tres &quot;optimaux&quot; suivants (<strong><code>best_valid_loss=0.0031991</code></strong> apr&#xE8;s <strong>82</strong> epcohs) :</p>
+<pre data-role="codeBlock" data-info="python" class="language-python"><span class="token punctuation">{</span>
 
 DETECTOR_HP <span class="token operator">=</span> <span class="token punctuation">{</span>
     <span class="token string">&apos;batch_size&apos;</span><span class="token punctuation">:</span> <span class="token number">16</span><span class="token punctuation">,</span>
@@ -1375,54 +609,22 @@ DETECTOR_HP <span class="token operator">=</span> <span class="token punctuation
                          <span class="token punctuation">(</span><span class="token string">&apos;fully_connected&apos;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</pre>
-    <p><strong><em>&gt; Voir les r&#xE9;sultats des recherches d&apos;hyperparam&#xE8;tres en annexe pour plus de
-          d&#xE9;tails sur leurs r&#xE9;sultats</em></strong></p>
-    <p>L&apos;architecture de ce mod&#xE8;le obtenu avec la derni&#xE8;re recherche d&apos;hyperparam&#xE8;tres est la
-      suivante :</p>
-    <p><img src="./figures/detector_architecture2.png" alt="detector_architecture2.png"></p>
-    <p>Nous avons ensuite entrain&#xE9; le mod&#xE8;le obtenu plus longement et chang&#xE9; le scheduling du learning
-      rate pour permettre une meilleure convergance sur un plus grand nombre d&apos;&#xE9;pochs en &#xE9;vitant
-      l&apos;overfitting: avec ces hyperpram&#xE8;tres un learning rate multipli&#xE9; par <code>gamma=0.3</code> toutes
-      les <strong>40</strong> epochs d&apos;entrainement, on obtient:
-      <strong><code>best_train_loss=0.0005548</code></strong> et <strong><code>best_valid_loss=0.0004782</code></strong>
-      au bout de la 339&#xE8;me epoch.</p>
-    <p>Ci dessous quelques r&#xE9;sultats obtenus avec ce mod&#xE8;le sur des images du validset:</p>
-    <p><img src="./figures/example_validset_inference.png" alt="example_validset_inference.png"></p>
-    <p>On peut constater sur les exemples ci-dessus que le mod&#xE8;le de d&#xE9;tection de balle et de classification
-      de ler couleur fonctionne, malgr&#xE9; quelques petites impr&#xE9;cisions sur la position exacte de la balle
-      (underfitting l&#xE9;g&#xE9; sur les coordonn&#xE9;es).</p>
-    <h5 class="mume-header"
-      id="tache-2-mod%C3%A8le-de-pr%C3%A9diction-de-position-de-balles-voir-srcballdetectseq_predictionpy-et-les-hyperparam%C3%A8tres-associ%C3%A9s-dans-srctrainpy">
-      Tache 2: Mod&#xE8;le de pr&#xE9;diction de position de balles (voir
-      <code>../src/balldetect/seq_prediction.py</code> et les hyperparam&#xE8;tres associ&#xE9;s dans
-      <code>../src/train.py</code>)</h5>
+</pre><p><strong><em>&gt; Voir les r&#xE9;sultats des recherches d&apos;hyperparam&#xE8;tres en annexe pour plus de d&#xE9;tails sur leurs r&#xE9;sultats</em></strong></p>
+<p>L&apos;architecture de ce mod&#xE8;le obtenu avec la derni&#xE8;re recherche d&apos;hyperparam&#xE8;tres est la suivante :</p>
+<p><img src="./figures/detector_architecture2.png" alt="detector_architecture2.png"></p>
+<p>Nous avons ensuite entrain&#xE9; le mod&#xE8;le obtenu plus longement et chang&#xE9; le scheduling du learning rate pour permettre une meilleure convergance sur un plus grand nombre d&apos;&#xE9;pochs en &#xE9;vitant l&apos;overfitting: avec ces hyperpram&#xE8;tres un learning rate multipli&#xE9; par <code>gamma=0.3</code> toutes les <strong>40</strong> epochs d&apos;entrainement, on obtient: <strong><code>best_train_loss=0.0005548</code></strong> et <strong><code>best_valid_loss=0.004782</code></strong> au bout de la 339&#xE8;me epoch.</p>
+<p>Ci dessous quelques r&#xE9;sultats obtenus avec ce mod&#xE8;le sur des images du validset:</p>
+<p><img src="./figures/example_validset_inference.png" alt="example_validset_inference.png"></p>
+<p>On peut constater sur les exemples ci-dessus que le mod&#xE8;le de d&#xE9;tection de balle et de classification de ler couleur fonctionne, malgr&#xE9; quelques petites impr&#xE9;cisions sur la position exacte de la balle (underfitting l&#xE9;g&#xE9; sur les coordonn&#xE9;es).</p>
+<h5 class="mume-header" id="tache-2-mod%C3%A8le-de-pr%C3%A9diction-de-position-de-balles-voir-srcballdetectseq_predictionpy-et-les-hyperparam%C3%A8tres-associ%C3%A9s-dans-srctrainpy">Tache 2: Mod&#xE8;le de pr&#xE9;diction de position de balles (voir <code>../src/balldetect/seq_prediction.py</code> et les hyperparam&#xE8;tres associ&#xE9;s dans <code>../src/train.py</code>)</h5>
 
-    <p>Le mod&#xE8;le de pr&#xE9;diction de position de balles est un simple r&#xE9;seaux de neurones dense (fully
-      connected layers) puisque qu&apos;il n&apos;y a pas d&apos;images en entr&#xE9;e du mod&#xE8;le.</p>
-    <p>Pour simplifier l&apos;entrainement du mod&#xE8;le, nous avons transform&#xE9; les donn&#xE9;es pour enlever la
-      redondance d&apos;information sur la couleur des balles. En effet, puisque la couleur des balles ne changent pas
-      dans la s&#xE9;quence, nous entrainons le mod&#xE8;le pour ne pr&#xE9;dire que trois bounding boxes (la position
-      des trois balles donn&#xE9;es en entr&#xE9;e).<br>
-      Nous enlevons donc les vecteurs nuls des boundings boxes en entr&#xE9;e (19 x 3 x 4 coordonn&#xE9;es) et des
-      bounding box cibles (3 x 4 coordonn&#xE9;es). Nous donnons &#xE9;galement le vecteur de couleurs (de taille 9) au
-      cas o&#xF9; la couleur des balles donerais de l&apos;information sur les propri&#xE9;t&#xE9;s physiques des
-      balles. Cette simplification des donn&#xE9;es permet une convergence bien plus rappide et meilleure.</p>
-    <p>Le mod&#xE8;le est un r&#xE9;seaux compos&#xE9; uniquement de couches denses (fully connected). Les couches sont
-      d&#xE9;finies de mani&#xE8;re similaire aux couches denses du mod&#xE8;le de d&#xE9;tection (t&#xE2;che 1) &#xE0;
-      la diff&#xE9;rence pr&#xE8;s de la fonction d&apos;activation utilis&#xE9;e :
-      <strong><code>nn.tanh</code></strong> et, biens&#xFB;r, &#xE0; leur largeur pr&#xE8;s.</p>
-    <p>La proc&#xE9;dure d&apos;entrainement du mod&#xE8;le est relativement similaire &#xE0; celle du mod&#xE8;le de
-      detection de la tache 1, aux hyperparam&#xE8;tres pr&#xE8;s. Le mod&#xE8;le est entrain&#xE9; sur le dataset
-      <strong><code>../dataset/mini_balls_seq</code></strong> avec une s&#xE9;paration al&#xE9;atoire entre validset
-      (10% du dataset) et du trainset (90% du dataset), sans testset pour &#xE9;viter de perdre trop de donn&#xE9;es,
-      &#xE9;tant donn&#xE9; la petite taille du dataset. Nous n&apos;avons malheureusement pas p&#xFB; travailler autant
-      que voulut sur l&apos;interpr&#xE8;tation de la qualit&#xE9; des pr&#xE9;dictions faites sur les positions des
-      balles au del&#xE0; de la m&#xE9;trique utilis&#xE9;e, la MSE calcul&#xE9;e sur les trois bounding boxes de sortie
-      normalis&#xE9;es par le vecteur <code>balldetect.datasets.BBOX_SCALE</code>.</p>
-    <p>Ci-dessous, l&apos;espace de recherche d&apos;hyperparam&#xE8;tres utilis&#xE9;e pour trouver les param&#xE8;tres
-      de ce mod&#xE8;le:</p>
-    <pre data-role="codeBlock" data-info="python" class="language-python"><span class="token punctuation">{</span>
+<p>Le mod&#xE8;le de pr&#xE9;diction de position de balles est un simple r&#xE9;seaux de neurones dense (fully connected layers) puisque qu&apos;il n&apos;y a pas d&apos;images en entr&#xE9;e du mod&#xE8;le.</p>
+<p>Pour simplifier l&apos;entrainement du mod&#xE8;le, nous avons transform&#xE9; les donn&#xE9;es pour enlever la redondance d&apos;information sur la couleur des balles. En effet, puisque la couleur des balles ne changent pas dans la s&#xE9;quence, nous entrainons le mod&#xE8;le pour ne pr&#xE9;dire que trois bounding boxes (la position des trois balles donn&#xE9;es en entr&#xE9;e).<br>
+Nous enlevons donc les vecteurs nuls des boundings boxes en entr&#xE9;e (19 x 3 x 4 coordonn&#xE9;es) et des bounding box cibles (3 x 4 coordonn&#xE9;es). Nous donnons &#xE9;galement le vecteur de couleurs (de taille 9) au cas o&#xF9; la couleur des balles donerais de l&apos;information sur les propri&#xE9;t&#xE9;s physiques des balles. Cette simplification des donn&#xE9;es permet une convergence bien plus rappide et meilleure.</p>
+<p>Le mod&#xE8;le est un r&#xE9;seaux compos&#xE9; uniquement de couches denses (fully connected). Les couches sont d&#xE9;finies de mani&#xE8;re similaire aux couches denses du mod&#xE8;le de d&#xE9;tection (t&#xE2;che 1) &#xE0; la diff&#xE9;rence pr&#xE8;s de la fonction d&apos;activation utilis&#xE9;e : <strong><code>nn.tanh</code></strong> et, biens&#xFB;r, &#xE0; leur largeur pr&#xE8;s.</p>
+<p>La proc&#xE9;dure d&apos;entrainement du mod&#xE8;le est relativement similaire &#xE0; celle du mod&#xE8;le de detection de la tache 1, aux hyperparam&#xE8;tres pr&#xE8;s. Le mod&#xE8;le est entrain&#xE9; sur le dataset <strong><code>../dataset/mini_balls_seq</code></strong> avec une s&#xE9;paration al&#xE9;atoire entre validset (10% du dataset) et du trainset (90% du dataset), sans testset pour &#xE9;viter de perdre trop de donn&#xE9;es, &#xE9;tant donn&#xE9; la petite taille du dataset. Nous n&apos;avons malheureusement pas p&#xFB; travailler autant que voulut sur l&apos;interpr&#xE8;tation de la qualit&#xE9; des pr&#xE9;dictions faites sur les positions des balles au del&#xE0; de la m&#xE9;trique utilis&#xE9;e, la MSE calcul&#xE9;e sur les trois bounding boxes de sortie normalis&#xE9;es par le vecteur <code>balldetect.datasets.BBOX_SCALE</code>.</p>
+<p>Ci-dessous, l&apos;espace de recherche d&apos;hyperparam&#xE8;tres utilis&#xE9;e pour trouver les param&#xE8;tres de ce mod&#xE8;le:</p>
+<pre data-role="codeBlock" data-info="python" class="language-python"><span class="token punctuation">{</span>
     <span class="token string">&apos;optimizer_params&apos;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">&apos;lr&apos;</span><span class="token punctuation">:</span> hp<span class="token punctuation">.</span>uniform<span class="token punctuation">(</span><span class="token string">&apos;lr&apos;</span><span class="token punctuation">,</span> <span class="token number">5e</span><span class="token operator">-</span><span class="token number">6</span><span class="token punctuation">,</span> <span class="token number">1e</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&apos;betas&apos;</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token number">0.9</span><span class="token punctuation">,</span> <span class="token number">0.999</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&apos;eps&apos;</span><span class="token punctuation">:</span> <span class="token number">1e</span><span class="token operator">-</span><span class="token number">8</span><span class="token punctuation">,</span> <span class="token string">&apos;weight_decay&apos;</span><span class="token punctuation">:</span> hp<span class="token punctuation">.</span>loguniform<span class="token punctuation">(</span><span class="token string">&apos;weight_decay&apos;</span><span class="token punctuation">,</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">,</span> math<span class="token punctuation">.</span>log<span class="token punctuation">(</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">&apos;amsgrad&apos;</span><span class="token punctuation">:</span> <span class="token boolean">False</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
     <span class="token string">&apos;scheduler_params&apos;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token string">&apos;step_size&apos;</span><span class="token punctuation">:</span> EPOCHS<span class="token punctuation">,</span> <span class="token string">&apos;gamma&apos;</span><span class="token punctuation">:</span> <span class="token number">1</span><span class="token punctuation">.</span><span class="token punctuation">}</span><span class="token punctuation">,</span>
     <span class="token comment"># &apos;scheduler_params&apos;: {&apos;max_lr&apos;: 1e-2, &apos;pct_start&apos;: 0.3, &apos;anneal_strategy&apos;: &apos;cos&apos;},</span>
@@ -1438,11 +640,8 @@ DETECTOR_HP <span class="token operator">=</span> <span class="token punctuation
                                               <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">&apos;out_features&apos;</span><span class="token punctuation">:</span> <span class="token number">128</span><span class="token punctuation">}</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">&apos;out_features&apos;</span><span class="token punctuation">:</span> <span class="token number">256</span><span class="token punctuation">}</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">,</span>
                                               <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">&apos;out_features&apos;</span><span class="token punctuation">:</span> <span class="token number">128</span><span class="token punctuation">}</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">3</span> <span class="token operator">+</span> <span class="token punctuation">[</span><span class="token punctuation">{</span><span class="token string">&apos;out_features&apos;</span><span class="token punctuation">:</span> <span class="token number">256</span><span class="token punctuation">}</span><span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</pre>
-    <p>Le meilleur mod&#xE8;le trouv&#xE9; &#xE0; pour hypererparam&#xE8;tres le dictionnaire suivant
-      (<strong><code>best_valid_mse=0.0005018, best_train_mse=0.0005203, at 78th epoch over 90 epochs</code></strong>) :
-    </p>
-    <pre data-role="codeBlock" data-info="python" class="language-python">SEQ_PRED_HP <span class="token operator">=</span> <span class="token punctuation">{</span>
+</pre><p>Le meilleur mod&#xE8;le trouv&#xE9; &#xE0; pour hypererparam&#xE8;tres le dictionnaire suivant (<strong><code>best_valid_mse=0.0005018, best_train_mse=0.0005203, at 78th epoch over 90 epochs</code></strong>) :</p>
+<pre data-role="codeBlock" data-info="python" class="language-python">SEQ_PRED_HP <span class="token operator">=</span> <span class="token punctuation">{</span>
     <span class="token string">&apos;batch_size&apos;</span><span class="token punctuation">:</span> <span class="token number">16</span><span class="token punctuation">,</span>
     <span class="token string">&apos;early_stopping&apos;</span><span class="token punctuation">:</span> <span class="token number">30</span><span class="token punctuation">,</span>
     <span class="token string">&apos;epochs&apos;</span><span class="token punctuation">:</span> <span class="token number">400</span><span class="token punctuation">,</span>
@@ -1457,101 +656,50 @@ DETECTOR_HP <span class="token operator">=</span> <span class="token punctuation
                       <span class="token punctuation">{</span><span class="token string">&apos;out_features&apos;</span><span class="token punctuation">:</span> <span class="token number">128</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span>
-</pre>
-    <p>Une fois ce mod&#xE8;le entrain&#xE9; sur plus d&apos;epochs et un learning rate scheduler adapt&#xE9;, avec <a
-        href="../src/train.py">../src/train.py</a>, nous obtenons les r&#xE9;sultats suivants :
-      <strong><code>best_valid_mse=0.0003570</code></strong> et <strong><code>best_train_mse=0.0002038</code></strong>
-      au bout de la 270&#xE8;me epcoh d&apos;entrainement (early stopping &#xE0; la 300&#xE8;me epoch).</p>
-    <p>Malheureusement, malgr&#xE9; les dispositions sur la reproductibilit&#xE9;, si l&apos;on relance
-      l&apos;entrainement, nous obtenons les r&#xE9;sultats suivants (peut-&#xEA;tre li&#xE9; &#xE0; l&apos;optimisation
-      de CuDNN non-deterministe) :<br>
-      <strong><code>best_train_mse=0.0005548</code></strong> et <strong><code>best_valid_mse=0.0004782</code></strong>
-      &#xE0; la 173&#xE8;me epoch (early stopping &#xE0; la 203&#xE8;me epoch).</p>
-    <p>Je n&apos;ai pas eu le temps de mieux interpr&#xEA;ter les valeurs de loss pour ce mod&#xE8;le et pour visualiser
-      les s&#xE9;quences de bounding boxes inf&#xE9;r&#xE9;es.</p>
-    <p>Il aurait aussi &#xE9;t&#xE9; interessant de voir le comportement du mod&#xE8;le si appliqu&#xE9; de mani&#xE8;re
-      &quot;r&#xE9;currente&apos; en donnant pour s&#xE9;quence dn entr&#xE9;e les 18 derni&#xE8;res positions et la
-      position inf&#xE9;r&#xE9;e pr&#xE9;c&#xE9;demment pour en d&#xE9;duire la position de la balle &#xE0;
-      l&apos;instant t+2 et ainsi de suite... (plus ou moins simmilaire &#xE0; l&apos;application d&apos;un RNN avec une
-      &apos;fen&#xEA;tre contextuelle&apos; de 20&#xE9;tapes, mais sans features repr&#xE9;santant
-      l&apos;&apos;&#xE9;tats interne&apos; du RNN)</p>
-    <h3 class="mume-header" id="conclusion">Conclusion</h3>
+</pre><p>Une fois ce mod&#xE8;le entrain&#xE9; sur plus d&apos;epochs et un learning rate scheduler adapt&#xE9;, avec <a href="../src/train.py">../src/train.py</a>, nous obtenons les r&#xE9;sultats suivants : <strong><code>best_valid_mse=0.0003570</code></strong> et <strong><code>best_train_mse=0.0002038</code></strong> au bout de la 270&#xE8;me epcoh d&apos;entrainement (early stopping &#xE0; la 300&#xE8;me epoch).</p>
+<p>Malheureusement, malgr&#xE9; les dispositions sur la reproductibilit&#xE9;, si l&apos;on relance l&apos;entrainement, nous obtenons les r&#xE9;sultats suivants (peut-&#xEA;tre li&#xE9; &#xE0; l&apos;optimisation de CuDNN non-deterministe) :<br>
+<strong><code>best_train_mse=0.0005548</code></strong> et <strong><code>best_valid_mse=0.0004782</code></strong> &#xE0; la 173&#xE8;me epoch (early stopping &#xE0; la 203&#xE8;me epoch).</p>
+<p>Je n&apos;ai pas eu le temps de mieux interpr&#xEA;ter les valeurs de loss pour ce mod&#xE8;le et pour visualiser les s&#xE9;quences de bounding boxes inf&#xE9;r&#xE9;es.</p>
+<p>Il aurait aussi &#xE9;t&#xE9; interessant de voir le comportement du mod&#xE8;le si appliqu&#xE9; de mani&#xE8;re &quot;r&#xE9;currente&apos; en donnant pour s&#xE9;quence dn entr&#xE9;e les 18 derni&#xE8;res positions et la position inf&#xE9;r&#xE9;e pr&#xE9;c&#xE9;demment pour en d&#xE9;duire la position de la balle &#xE0; l&apos;instant t+2 et ainsi de suite...  (plus ou moins simmilaire &#xE0; l&apos;application d&apos;un RNN avec une &apos;fen&#xEA;tre contextuelle&apos; de 20&#xE9;tapes, mais sans features repr&#xE9;santant l&apos;&apos;&#xE9;tats interne&apos; du RNN)</p>
+<h3 class="mume-header" id="conclusion">Conclusion</h3>
 
-    <p>Pour conclure, d&#xE9;velopper et tester des mod&#xE8;les Pytorch, certes simples, m&apos;as permit
-      d&apos;approfondir mes connaissances en deep learning, notamment d&apos;un point de vue pratique/technique.</p>
-    <p>Il est regretable que l&apos;interpretation des m&#xE9;triques et la visualisation des r&#xE9;sultats de la
-      t&#xE2;che 2 souffre d&apos;un manque de temps (ou plut&#xF4;t, est la cons&#xE9;quence des priot&#xE9;s
-      donn&#xE9;es aux diff&#xE9;rents aspects du projet). Cepandant, nous avons p&#xFB; d&#xE9;velopper des
-      mod&#xE8;les Pytorch et des proc&#xE9;dures d&apos;entrainement assez fonctionels, complets, g&#xE9;n&#xE9;rique
-      et r&#xE9;utilisables. En effet, ce projet a &#xE9;galement &#xE9;t&#xE9; l&apos;occasion poser une base de code
-      relativement solide pour de futurs projets en Pytorch.</p>
-    <h4 class="mume-header" id="autres-pistes-et-am%C3%A9liorations-possibles">Autres pistes et am&#xE9;liorations
-      possibles</h4>
+<p>Pour conclure, d&#xE9;velopper et tester des mod&#xE8;les Pytorch, certes simples, m&apos;as permit d&apos;approfondir mes connaissances en deep learning, notamment d&apos;un point de vue pratique/technique.</p>
+<p>Il est regretable que l&apos;interpretation des m&#xE9;triques et la visualisation des r&#xE9;sultats de la t&#xE2;che 2 souffre d&apos;un manque de temps (ou plut&#xF4;t, est la cons&#xE9;quence des priot&#xE9;s donn&#xE9;es aux diff&#xE9;rents aspects du projet). Cepandant, nous avons p&#xFB; d&#xE9;velopper des mod&#xE8;les Pytorch et des proc&#xE9;dures d&apos;entrainement assez fonctionels, complets, g&#xE9;n&#xE9;rique et r&#xE9;utilisables. En effet, ce projet a &#xE9;galement &#xE9;t&#xE9; l&apos;occasion poser une base de code relativement solide pour de futurs projets en Pytorch.</p>
+<h4 class="mume-header" id="autres-pistes-et-am%C3%A9liorations-possibles">Autres pistes et am&#xE9;liorations possibles</h4>
 
-    <ul>
-      <li>travailler d&apos;avantage sur l&apos;interpr&#xE8;tation et l&apos;investigation des m&#xE9;triques: calculer
-        des m&#xE9;triques plus interpretables que la loss de la t&#xE2;che 1 qui n&apos;est pas vraiment interpretable
-        en l&apos;&#xE9;tat.</li>
-      <li>exploiter d&apos;avantage d&apos;a prioris sur le vecteur des couleurs lors de la detection de balles de la
-        t&#xE2;che 1 : sur les 9 valeurs binaires du vecteur de couleurs, 3 sont &#xE0; 1 et les autres &#xE0; 0, or,
-        notre mod&#xE8;le est entrain&#xE9; pour faire une classification multi-classes (vecteur de couleurs en sortie
-        de taille 9 avec une binary cross-entropy loss) alors qu&apos;il pourait s&apos;agir de classifier 3 valeurs
-        (comprises entre 0 et 8) repr&#xE9;santant les index des 3 valeurs &#xE0; 1 dans le vecteur de couleurs.
-        Cepandant, il n&apos;est pas certains que cette approche am&#xE9;liorerais les performances puisque pr&#xE9;dire
-        une &apos;simili-lookup table&apos; (ou embedding layer) a ses avantages : empiriquement on constate souvent que
-        la qualit&#xE9; des pr&#xE9;dictions est meilleures ainsi (probablement car les gradients sont moins
-        &apos;intriqu&#xE9;s&apos; en sortie et chaque possiblit&#xE9;es de classification &#xE0; une sortie
-        d&#xE9;di&#xE9;e, donc un parcours dans le r&#xE9;seaux plus ind&#xE9;pendant).</li>
-      <li>finir l&apos;impl&#xE9;mentation de la sauvegarde de mod&#xE8;les et du logging des m&#xE9;triques pour
-        tensorboard (utilisation de tensorboard avec Pytorch pour mieux diagnostiquer et visualiser
-        l&apos;entrainement).</li>
-      <li>exploiter l&apos;as prioris sur les coordonn&#xE9;es des bounding boxes: non seulement les coordonn&#xE9;es
-        sont dans un certain ordre mais, dans ce dataset, toutes les balles sont environs de la m&#xEA;me taille, on
-        pourrait donc simplement faire une regression sur, par exemple, la moyennes des deux coordonn&#xE9;es d&apos;une
-        bounding box (centre de la balle). De mani&#xE8;re moins agressive, on pourrait aussi ajouter un terme dans la
-        loss encouragant un certain ordre entre les valeurs des coordonn&#xE9;es des bounding boxes.</li>
-      <li>utiliser la mean average precision combin&#xE9;e avec une m&#xE9;trique <em>d&apos;Intersection over
-          Union</em> (IoU) pour la regression des bounding boxes, comme utilis&#xE9;e sur le dataset Pascal VOC</li>
-      <li>utiliser de la cross validation &#xE9;tant donn&#xE9; la petite taille du dataset</li>
-      <li>cr&#xE9;er un petit testset pour &#xE9;valuer tr&#xE8;s ponctuellement le mod&#xE8;le autrement que par le
-        validset qui pourrait &#xEA;tre compromis par la recherche d&apos;hyperparam&#xE8;tres</li>
-      <li>utiliser des m&#xE9;thodes de recherche d&apos;hyperparam&#xE8;tres plus efficaces (e.g. la m&#xE9;thode
-        utilis&#xE9;e par fastai dans <a href="https://docs.fast.ai/callbacks.lr_finder.html">callbacks.lr_finder</a>:
-        <a href="https://sgugger.github.io/how-do-you-find-a-good-learning-rate.html">post de blog de Sylvain
-          Gugger</a>) et utilisation de <a href="https://github.com/microsoft/nni">microsoft/nni</a> regroupant de
-        nombreuses de m&#xE9;thodes de recherche d&apos;hyperparam&#xE8;tres)</li>
-      <li>utiliser des m&#xE9;thodes de recherche d&apos;architecture automatiques (beaucoup
-        d&apos;engouement/progr&#xE8;s dans la communaut&#xE9; deeplearning autour des m&#xE9;thodes de &quot;neural net
-        architecture search&quot; et &quot;meta-learning&quot;)</li>
-      <li>tests plus pouss&#xE9;s du scheduling de learning rate (e.g. investiger pourquoi OneCycle learning rate
-        scheduler n&apos;a pas donn&#xE9; de r&#xE9;sultats probants sur la d&#xE9;tection de balles avec notre
-        mod&#xE8;l)</li>
-      <li>utiliser de l&apos;augmentation de donn&#xE9;es aurait p&#xFB; &#xEA;tre int&#xE9;ressant</li>
-      <li>comparer les r&#xE9;sultats et approches avec le papier <a
-          href="https://arxiv.org/pdf/1909.12000.pdf">https://arxiv.org/pdf/1909.12000.pdf</a></li>
-    </ul>
-    <img width="250" src="./figures/logo_insa.jpg">
-    <p><em>Copyright (c) 2019 Paul-Emmanuel SOTIR</em><br>
-      <em><strong>This project and document is under open-source MIT license, browse to: <a
-            href="https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting/blob/master/LICENSE">https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting/blob/master/LICENSE</a>
-          for full MIT license text.</strong></em></p>
-    <h1 class="mume-header" id="annexe-resultats-des-recherches-dhyperparam%C3%A8tres">Annexe : Resultats des recherches
-      d&apos;hyperparam&#xE8;tres</h1>
+<ul>
+<li>travailler d&apos;avantage sur l&apos;interpr&#xE8;tation et l&apos;investigation des m&#xE9;triques: calculer des m&#xE9;triques plus interpretables que la loss de la t&#xE2;che 1 qui n&apos;est pas vraiment interpretable en l&apos;&#xE9;tat.</li>
+<li>exploiter d&apos;avantage d&apos;a prioris sur le vecteur des couleurs lors de la detection de balles de la t&#xE2;che 1 : sur les 9 valeurs binaires du vecteur de couleurs, 3 sont &#xE0; 1 et les autres &#xE0; 0, or, notre mod&#xE8;le est entrain&#xE9; pour faire une classification multi-classes (vecteur de couleurs en sortie de taille 9 avec une binary cross-entropy loss) alors qu&apos;il pourait s&apos;agir de classifier 3 valeurs (comprises entre 0 et 8) repr&#xE9;santant les index des 3 valeurs &#xE0; 1 dans le vecteur de couleurs. Cepandant, il n&apos;est pas certains que cette approche am&#xE9;liorerais les performances puisque pr&#xE9;dire une &apos;simili-lookup table&apos; (ou embedding layer) a ses avantages : empiriquement on constate souvent que la qualit&#xE9; des pr&#xE9;dictions est meilleures ainsi (probablement car les gradients sont moins &apos;intriqu&#xE9;s&apos; en sortie et chaque possiblit&#xE9;es de classification &#xE0; une sortie d&#xE9;di&#xE9;e, donc un parcours dans le r&#xE9;seaux plus ind&#xE9;pendant).</li>
+<li>finir l&apos;impl&#xE9;mentation de la sauvegarde de mod&#xE8;les et du logging des m&#xE9;triques pour tensorboard (utilisation de tensorboard avec Pytorch pour mieux diagnostiquer et visualiser l&apos;entrainement).</li>
+<li>exploiter l&apos;as prioris sur les coordonn&#xE9;es des bounding boxes: non seulement les coordonn&#xE9;es sont dans un certain ordre mais, dans ce dataset, toutes les balles sont environs de la m&#xEA;me taille, on pourrait donc simplement faire une regression sur, par exemple, la moyennes des deux coordonn&#xE9;es d&apos;une bounding box (centre de la balle). De mani&#xE8;re moins agressive, on pourrait aussi ajouter un terme dans la loss encouragant un certain ordre entre les valeurs des coordonn&#xE9;es des bounding boxes.</li>
+<li>utiliser la mean average precision combin&#xE9;e avec une m&#xE9;trique <em>d&apos;Intersection over Union</em> (IoU) pour la regression des bounding boxes, comme utilis&#xE9;e sur le dataset Pascal VOC</li>
+<li>utiliser de la cross validation &#xE9;tant donn&#xE9; la petite taille du dataset</li>
+<li>cr&#xE9;er un petit testset pour &#xE9;valuer tr&#xE8;s ponctuellement le mod&#xE8;le autrement que par le validset qui pourrait &#xEA;tre compromis par la recherche d&apos;hyperparam&#xE8;tres</li>
+<li>utiliser des m&#xE9;thodes de recherche d&apos;hyperparam&#xE8;tres plus efficaces (e.g. la m&#xE9;thode utilis&#xE9;e par fastai dans <a href="https://docs.fast.ai/callbacks.lr_finder.html">callbacks.lr_finder</a>: <a href="https://sgugger.github.io/how-do-you-find-a-good-learning-rate.html">post de blog de Sylvain Gugger</a>) et utilisation de <a href="https://github.com/microsoft/nni">microsoft/nni</a> regroupant de nombreuses de m&#xE9;thodes de recherche d&apos;hyperparam&#xE8;tres)</li>
+<li>utiliser des m&#xE9;thodes de recherche d&apos;architecture automatiques (beaucoup d&apos;engouement/progr&#xE8;s dans la communaut&#xE9; deeplearning autour des m&#xE9;thodes de &quot;neural net architecture search&quot; et &quot;meta-learning&quot;)</li>
+<li>tests plus pouss&#xE9;s du scheduling de learning rate (e.g. investiger pourquoi OneCycle learning rate scheduler n&apos;a pas donn&#xE9; de r&#xE9;sultats probants sur la d&#xE9;tection de balles avec notre mod&#xE8;l)</li>
+<li>utiliser de l&apos;augmentation de donn&#xE9;es aurait p&#xFB; &#xEA;tre int&#xE9;ressant</li>
+<li>comparer les r&#xE9;sultats et approches avec le papier <a href="https://arxiv.org/pdf/1909.12000.pdf">https://arxiv.org/pdf/1909.12000.pdf</a></li>
+</ul>
+<img width="250" src="./figures/logo_insa.jpg">
+<p><em>Copyright (c) 2019 Paul-Emmanuel SOTIR</em><br>
+<em><strong>This project and document is under open-source MIT license, browse to: <a href="https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting/blob/master/LICENSE">https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting/blob/master/LICENSE</a> for full MIT license text.</strong></em></p>
+<h1 class="mume-header" id="annexe-recherches-dhyperparam%C3%A8tres">Annexe : recherches d&apos;hyperparam&#xE8;tres</h1>
 
-    <p>(<em><strong>notebook &#xE9;crit en anglais</strong></em>)</p>
+<h2 class="mume-header" id="hyperparameter-search-results-visualization-notebooknotebookshp_search_resultsipynb"><a href="../notebooks/hp_search_results.ipynb">Hyperparameter search results visualization notebook</a></h2>
 
-  </div>
+<p>Or alternatively, view the thml version of this document with hyperprameter search results visualization at <a href></a> or the pdf version here: [](./</p>
 
-
-
-
-
-
-
-
-
-
-
-</body>
-
-</html>
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    </body></html>

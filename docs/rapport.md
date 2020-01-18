@@ -139,7 +139,7 @@ Epoch 002/400
 ...
 ```
 
-Une fois les recherches d'hyperparamètres lancées ou terminées, on peut utiliser les fonction outils __```balldetect.torch_utils.extract_from_hp_search_log()```__ et __```balldetect.torch_utils.summarize_hp_search()```__ pour explorer les résultats d'une recherche d'hyperparamètres sur un notebook jupyter, par example (voir le notebook ```../notebooks/ball_detection_hp_search_results.ipynb```, les logs bruts situé dans le dossier [../hp_search_logs/](../hp_search_logs/), l'annexe à la fin de ce rapport pour les résultats des recherches d'hyperparamètres ou ```../src/hp.py``` pour l'implémentation de la recherche d'hyperparamètres avec le module '__hyperopt__').
+Une fois les recherches d'hyperparamètres lancées ou terminées, on peut utiliser les fonction outils __```balldetect.torch_utils.extract_from_hp_search_log()```__ et __```balldetect.torch_utils.summarize_hp_search()```__ pour explorer les résultats d'une recherche d'hyperparamètres sur un notebook jupyter, par example (voir le notebook ```../notebooks/hp_search_results.ipynb```, les logs bruts situé dans le dossier [../docs/hp_search_logs/](../docs/hp_search_logs/), l'annexe à la fin de ce rapport pour les résultats des recherches d'hyperparamètres ou ```../src/hp.py``` pour l'implémentation de la recherche d'hyperparamètres avec le module '__hyperopt__').
 
 ### Developement et documentation
 
@@ -168,22 +168,22 @@ Organisation du dossier du projet :
     - train.py                  # Code utilisant le module 'balldetect' pour entrainer le modèle de detection ou de prédiction de position de balles
     - hp.py                     # Code de recherche d'hyperparamètres
   - notebooks/
-    - ball_detection_hp_search_results.ipynb  # Notebook inspectant le résultat des recherches d'hyperparamètres
+    - hp_search_results.ipynb  # Notebook inspectant le résultat des recherches d'hyperparamètres
     - test_fastai.ipynb         # Notebook 'brouillon' testant une approche préliminaire au TP avec fastai (tache 1.1)
     - test_fastai-bbox.ipynb    # Notebook 'brouillon'testant une approche préliminaire au TP avec fastai (tache 1.2: version avec bounding-boxes)
   - datasets/
     - mini_balls/
     - mini_balls_seq/
-  - hp_search_logs/             # Dossier des logs d'execution des recherches d'hyperparamètres ('../src/hp.py')
   - docs/
-    - rapport.md                # Ce rapport au format originel (markdown)
-    - rapport.html
-    - ball_detection_hp_search_results.html
     - figures/                  # Dossier d'images/figures contenues dans ce rapport
-  - download_dataset.sh         # Script de téléchargement des datasets
-  - environement.yml            # Environement conda, définit les dépendances
-  - LICENSE
+    - hp_search_logs/           # Dossier des logs d'execution des recherches d'hyperparamètres ('../src/hp.py')
+    - rapport.md                # Ce rapport au format originel (markdown)
+    - hp_search_results.html    # Annexe issue du notebook du même nom
+    - ...                       # Diverses versions du rapport et de l'annexe exportées en PDF et HTML
   - README.md
+  - LICENSE
+  - environement.yml            # Environement conda, définit les dépendances
+  - download_dataset.sh         # Script de téléchargement des datasets
   - .gitignore
 ```
 
@@ -393,7 +393,7 @@ L'architecture de ce modèle obtenu avec la dernière recherche d'hyperparamètr
 
 ![detector_architecture2.png](./figures/detector_architecture2.png)
 
-Nous avons ensuite entrainé le modèle obtenu plus longement et changé le scheduling du learning rate pour permettre une meilleure convergance sur un plus grand nombre d'épochs en évitant l'overfitting: avec ces hyperpramètres un learning rate multiplié par ```gamma=0.3``` toutes les **40** epochs d'entrainement, on obtient: **```best_train_loss=0.0005548```** et **```best_valid_loss=0.0004782```** au bout de la 339ème epoch.
+Nous avons ensuite entrainé le modèle obtenu plus longement et changé le scheduling du learning rate pour permettre une meilleure convergance sur un plus grand nombre d'épochs en évitant l'overfitting: avec ces hyperpramètres un learning rate multiplié par ```gamma=0.3``` toutes les **40** epochs d'entrainement, on obtient: **```best_train_loss=0.0005548```** et **```best_valid_loss=0.004782```** au bout de la 339ème epoch.
 
 Ci dessous quelques résultats obtenus avec ce modèle sur des images du validset:  
 
@@ -489,4 +489,5 @@ Il est regretable que l'interpretation des métriques et la visualisation des r�
 *__This project and document is under open-source MIT license, browse to: https://github.com/PaulEmmanuelSotir/BallDetectionAndForecasting/blob/master/LICENSE for full MIT license text.__*
 
 # Annexe : recherches d'hyperparamètres
-...
+## [Hyperparameter search results visualization notebook](../notebooks/hp_search_results.ipynb)
+Or alternatively, view the thml version of this document with hyperprameter search results visualization at []() or the pdf version here: [](./
